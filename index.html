@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almaíso — Social Media Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  /* Google Fonts loaded in <head> */
+  :root {
+    --jungle-50:#F4F6EF; --jungle-100:#E7EBDC; --jungle-200:#D1D8BE; --jungle-300:#B5C096;
+    --jungle-400:#9AA774; --jungle-500:#7E8B57; --jungle-600:#636E42; --jungle-700:#4D5536;
+    --jungle-800:#454B32; --jungle-900:#383D2A;
+    --sienna-50:#FBF6EF; --sienna-100:#F2E8D3; --sienna-150:#ECDFC1; --sienna-200:#E3CFA4;
+    --sienna-300:#D5B174; --sienna-400:#CB9A54; --sienna-500:#C1803F; --sienna-600:#AA6435;
+    --sienna-700:#965032; --sienna-800:#743D2C; --sienna-900:#613326;
+    --sand-100:#EAE3D7; --sand-300:#B79B74; --sand-400:#AD8B62;
+    --font:'DM Sans','Inter',system-ui,sans-serif;
+    --bg:var(--sienna-100); --surface:var(--sienna-50); --ink:var(--jungle-800);
+    --ink-soft:color-mix(in oklab,var(--jungle-800) 62%,var(--sienna-100) 38%);
+    --ink-faint:color-mix(in oklab,var(--jungle-800) 42%,var(--sienna-100) 58%);
+    --hair:color-mix(in oklab,var(--jungle-800) 16%,transparent);
+    --hair-soft:color-mix(in oklab,var(--jungle-800) 9%,transparent);
+    --accent:var(--sienna-700); --r-card:12px; --r-pill:999px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+  /* HEADER */
+  header{padding:26px 48px 22px;border-bottom:1px solid var(--hair);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px}
+  .brand{display:flex;align-items:center;gap:16px}
+  .brand .eyebrow{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+  .brand h1{font-size:24px;font-weight:500;letter-spacing:-.01em;line-height:1.1;color:var(--ink)}
+  .brand .subtitle{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+  .period-badge{background:var(--jungle-800);color:var(--sienna-100);padding:7px 16px;border-radius:var(--r-pill);font-size:12px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+
+  /* PLATFORM TABS */
+  .platform-tabs{padding:0 48px;border-bottom:1px solid var(--hair);display:flex;gap:0;background:var(--sienna-50)}
+  .ptab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--ink-faint);border:none;background:transparent;font-family:var(--font);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .16s;white-space:nowrap;display:flex;align-items:center;gap:8px}
+  .ptab:hover{color:var(--ink)}
+  .ptab.active{color:var(--ink);border-bottom-color:var(--accent)}
+  .ptab .ptab-icon{font-size:15px}
+  .ptab .ptab-count{font-size:10.5px;background:var(--hair);color:var(--ink-soft);padding:2px 7px;border-radius:var(--r-pill)}
+  .ptab.active .ptab-count{background:color-mix(in oklab,var(--accent) 18%,transparent);color:var(--accent)}
+
+  /* FILTER BAR */
+  .filters{padding:14px 48px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;border-bottom:1px solid var(--hair);background:color-mix(in oklab,var(--sienna-50) 70%,var(--sienna-100))}
+  .fgroup{display:flex;flex-direction:column;gap:6px}
+  .flabel{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+
+  /* DATE RANGE PICKER */
+  .date-range{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .date-sep{font-size:12px;color:var(--ink-faint)}
+  .date-input-wrap{position:relative}
+  .date-input-wrap .dinput-label{font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px;display:block}
+  input[type="date"]{
+    font-family:var(--font);font-size:12.5px;font-weight:500;color:var(--ink);
+    background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-pill);
+    padding:6px 14px;cursor:pointer;outline:none;
+    color-scheme:light;
+  }
+  input[type="date"]:focus{border-color:var(--accent)}
+  input[type="date"]::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer;filter:sepia(1) saturate(2) hue-rotate(330deg)}
+
+  .filter-quick{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .chip{padding:5px 12px;border-radius:var(--r-pill);border:1px solid var(--hair);background:transparent;color:var(--ink-soft);font-family:var(--font);font-size:11.5px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+  .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .chip.active{background:var(--jungle-800);border-color:var(--jungle-800);color:var(--sienna-100)}
+  .chip.reset{background:transparent;border-color:transparent;color:var(--accent);text-decoration:underline;text-underline-offset:3px;padding-left:4px}
+  .chip.reset:hover{opacity:.7}
+
+  /* Active range indicator */
+  .range-pill{display:inline-flex;align-items:center;gap:6px;background:color-mix(in oklab,var(--accent) 14%,transparent);border:1px solid color-mix(in oklab,var(--accent) 35%,transparent);color:var(--accent);padding:4px 11px;border-radius:var(--r-pill);font-size:11.5px;font-weight:500}
+  .range-pill.hidden{display:none}
+
+  /* MAIN */
+  .main{padding:28px 48px 56px;max-width:1440px;margin:0 auto}
+  .tab-pane{display:none}.tab-pane.active{display:block}
+
+  /* KPI ROW */
+  .kpi-row{display:grid;gap:12px;margin-bottom:22px}
+  .kpi-5{grid-template-columns:1.4fr repeat(4,1fr)}
+  .kpi-4{grid-template-columns:1.4fr repeat(3,1fr)}
+  .kpi{background:var(--surface);border:1px solid var(--hair-soft);border-radius:var(--r-card);padding:20px 20px 16px;display:flex;flex-direction:column;justify-content:flex-end;min-height:112px}
+  .kpi.hero{background:var(--sienna-700);border-color:var(--sienna-700)}
+  .kpi.hero-blue{background:var(--jungle-700);border-color:var(--jungle-700)}
+  .kpi .val{font-size:30px;font-weight:500;letter-spacing:-.03em;line-height:1;color:var(--ink)}
+  .kpi.hero .val,.kpi.hero-blue .val{font-size:42px;color:var(--sienna-50)}
+  .kpi .lbl{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:9px}
+  .kpi.hero .lbl,.kpi.hero-blue .lbl{color:color-mix(in oklab,var(--sienna-100) 72%,var(--sienna-300))}
+  .kpi .sub{font-size:11px;color:var(--ink-soft);margin-top:3px}
+  .kpi.hero .sub,.kpi.hero-blue .sub{color:var(--sienna-200)}
+
+  /* INSIGHTS */
+  .insights{background:var(--jungle-800);color:var(--sienna-100);border-radius:var(--r-card);padding:26px 30px;margin-bottom:20px}
+  .ins-head{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .insights h3{font-size:10.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sienna-300)}
+  .ins-sub{font-size:12.5px;color:color-mix(in oklab,var(--sienna-100) 52%,transparent)}
+  .insights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .insight-item{padding-left:14px;border-left:2px solid var(--sienna-600)}
+  .insight-item .ihead{font-size:14px;font-weight:500;letter-spacing:-.01em;margin-bottom:6px;color:var(--sienna-50)}
+  .insight-item .itext{font-size:12.5px;line-height:1.6;color:color-mix(in oklab,var(--sienna-100) 78%,var(--sienna-300))}
+  .insight-item .itext strong{color:var(--sienna-50);font-weight:600}
+
+  /* SECTION LABEL */
+  .slabel{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px;margin-top:24px}
+
+  /* CARDS */
+  .grid-2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:14px}
+  .grid-2-even{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .card{background:var(--surface);border:1px solid var(--hair-soft);border-radius:var(--r-card);padding:22px 24px;display:flex;flex-direction:column}
+  .card .chead{margin-bottom:16px}
+  .card h3{font-size:13.5px;font-weight:500;letter-spacing:-.005em;color:var(--ink)}
+  .card .csub{font-size:10.5px;color:var(--ink-faint);margin-top:3px}
+  .chart-wrap{position:relative;flex:1;min-height:210px}
+  canvas{max-height:240px}
+
+  /* SCORECARD */
+  .scorecard{display:flex;flex-direction:column}
+  .sc-head,.sc-row{display:grid;grid-template-columns:1.5fr 1fr 1fr;align-items:center;gap:8px}
+  .sc-head{padding-bottom:10px;border-bottom:1px solid var(--hair);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  .sc-head .col{display:inline-flex;align-items:center;gap:5px;justify-content:flex-end}
+  .sc-head .col .dot{width:8px;height:8px;border-radius:2px}
+  .sc-row{padding:11px 0;border-bottom:1px solid var(--hair-soft)}
+  .sc-row:last-child{border-bottom:none}
+  .sc-row .metric{font-size:12.5px;color:var(--ink-soft)}
+  .sc-row .v{text-align:right;font-size:14px;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+  .sc-row .v.win{color:var(--accent);font-weight:600}
+  .sc-row .v .tick{font-size:9px;color:var(--accent);margin-left:2px}
+
+  /* TABLE */
+  .card.wide{margin-bottom:14px}
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:8px 11px;color:var(--ink-faint);font-weight:500;text-transform:uppercase;font-size:9.5px;letter-spacing:.09em;border-bottom:1px solid var(--hair);white-space:nowrap;cursor:pointer;user-select:none}
+  th.no-sort{cursor:default}
+  th .arrow{opacity:0;margin-left:2px;font-size:9px}
+  th.sorted .arrow{opacity:1;color:var(--accent)}
+  th:hover:not(.no-sort){color:var(--ink)}
+  td{padding:10px 11px;border-bottom:1px solid var(--hair-soft);vertical-align:middle;color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:color-mix(in oklab,var(--sienna-200) 25%,transparent)}
+  td.num{font-variant-numeric:tabular-nums}
+  .rank{color:var(--ink-faint)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:var(--r-pill);font-size:10px;font-weight:500}
+  .badge-reel{background:color-mix(in oklab,var(--jungle-300) 55%,var(--sienna-100));color:var(--jungle-800)}
+  .badge-carousel{background:color-mix(in oklab,var(--sienna-300) 58%,var(--sienna-100));color:var(--sienna-900)}
+  .strong-v{font-weight:600}
+  .rate-v{font-weight:600;color:var(--accent)}
+  .desc{display:block;max-width:300px;font-size:11px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* STORIES GRID */
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+
+  /* FACEBOOK NOTE */
+  .fb-note{background:color-mix(in oklab,var(--sienna-200) 40%,transparent);border:1px solid var(--sienna-300);border-radius:var(--r-card);padding:14px 18px;font-size:12px;color:var(--ink-soft);margin-bottom:20px;line-height:1.6}
+  .fb-note strong{color:var(--ink)}
+
+  /* FOOTNOTE */
+  .footnote{font-size:10.5px;color:var(--ink-faint);max-width:1440px;padding:0 48px 44px;line-height:1.6}
+
+  /* RESPONSIVE */
+  @media(max-width:1100px){
+    .kpi-5,.kpi-4{grid-template-columns:1fr 1fr}
+    .kpi.hero,.kpi.hero-blue{grid-column:span 2}
+    .grid-2,.grid-2-even,.grid-3{grid-template-columns:1fr}
+    .insights-grid{grid-template-columns:1fr;gap:18px}
+  }
+  @media(max-width:680px){
+    header,.platform-tabs,.filters,.main,.footnote{padding-left:20px;padding-right:20px}
+    .brand h1{font-size:20px}
+    .ptab{padding:12px 14px;font-size:12px}
+  }
+
+  /* TOP 3 LIST */
+  .top3-block { margin-bottom: 20px; }
+  .top3-list-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .top3-list-title .metric-chip { font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; background: var(--hair); color: var(--ink-soft); padding: 2px 9px; border-radius: var(--r-pill); }
+  .top3-list-table { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; overflow: hidden; }
+  .top3-list-row { display: grid; grid-template-columns: 110px 1fr; border-bottom: 1px solid var(--hair-soft); }
+  .top3-list-row:last-child { border-bottom: none; }
+  .top3-list-row.is-all { background: color-mix(in oklab, var(--accent) 5%, transparent); }
+  .top3-period-col { padding: 14px 12px 14px 16px; border-right: 1px solid var(--hair-soft); display: flex; flex-direction: column; gap: 10px; }
+  .top3-period-name { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); padding-top: 2px; }
+  .top3-period-name.is-all { color: var(--accent); }
+  .top3-summary { display: flex; flex-direction: column; gap: 4px; }
+  .top3-sum-row { display: flex; flex-direction: column; gap: 0; }
+  .top3-sum-lbl { font-size: 8.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+  .top3-sum-val { font-size: 12px; font-weight: 700; color: var(--ink); }
+  .top3-items-col { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+  .top3-item { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--hair-soft); }
+  .top3-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .top3-item-rank { font-size: 10px; font-weight: 700; color: var(--ink-faint); min-width: 16px; }
+  .top3-item-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .top3-item-score { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .top3-item-desc { font-size: 11px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 520px; }
+  .top3-item-meta { display: flex; align-items: center; gap: 6px; }
+  .top3-item-date { font-size: 9.5px; color: var(--ink-faint); }
+  .top3-empty { font-size: 11px; color: var(--ink-faint); font-style: italic; padding: 6px 0; }
+
+  /* ── ADMIN ── */
+  .admin-trigger{position:fixed;bottom:22px;right:22px;width:36px;height:36px;border-radius:50%;background:var(--jungle-800);color:var(--sienna-100);border:none;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;transition:opacity .2s;z-index:900;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .admin-trigger:hover{opacity:1}
+  .admin-overlay{display:none;position:fixed;inset:0;background:rgba(40,36,30,.55);backdrop-filter:blur(3px);z-index:1000;align-items:center;justify-content:center}
+  .admin-overlay.open{display:flex}
+  .admin-modal{background:var(--sienna-50);border-radius:16px;padding:36px 40px;width:520px;max-width:94vw;box-shadow:0 8px 40px rgba(0,0,0,.22);position:relative}
+  .admin-modal h2{font-size:19px;font-weight:500;color:var(--ink);margin-bottom:4px}
+  .admin-modal .admin-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:28px}
+  .admin-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:20px;color:var(--ink-faint);cursor:pointer;line-height:1}
+  .admin-close:hover{color:var(--ink)}
+  /* login */
+  .admin-login label{display:block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+  .admin-login input{width:100%;padding:10px 14px;border:1.5px solid var(--hair);border-radius:8px;font-family:var(--font);font-size:14px;color:var(--ink);background:white;outline:none;transition:border .15s}
+  .admin-login input:focus{border-color:var(--accent)}
+  .admin-login .err{font-size:12px;color:#b03030;margin-top:8px;min-height:16px}
+  /* panel */
+  .admin-panel{display:none}
+  .admin-panel.visible{display:block}
+  .upload-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+  .upload-row{background:var(--bg);border:1.5px dashed var(--hair);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s}
+  .upload-row:hover{border-color:var(--accent)}
+  .upload-row.has-file{border-style:solid;border-color:var(--jungle-500);background:color-mix(in oklab,var(--jungle-500) 6%,transparent)}
+  .upload-row-info .upload-label{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .upload-row-info .upload-hint{font-size:11px;color:var(--ink-faint);margin-top:2px}
+  .upload-row-status{font-size:11px;font-weight:500;color:var(--ink-faint)}
+  .upload-row.has-file .upload-row-status{color:var(--jungle-600)}
+  .upload-row input[type=file]{display:none}
+  .btn-row{display:flex;gap:10px;margin-top:4px}
+  .btn-apply{background:var(--accent);color:white;border:none;padding:10px 22px;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s}
+  .btn-apply:hover{opacity:.88}
+  .btn-apply:disabled{opacity:.4;cursor:not-allowed}
+  .btn-clear{background:none;border:1.5px solid var(--hair);color:var(--ink-soft);padding:10px 18px;border-radius:8px;font-family:var(--font);font-size:13px;cursor:pointer}
+  .btn-clear:hover{border-color:var(--ink-soft)}
+  .apply-msg{font-size:12px;margin-top:10px;min-height:16px;color:var(--jungle-600);font-weight:500}
+  .admin-saved-badge{display:inline-block;margin-left:8px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:color-mix(in oklab,var(--jungle-500) 18%,transparent);color:var(--jungle-700);padding:2px 8px;border-radius:var(--r-pill)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span id="badge-slot"></span>
+    <div>
+      <div class="eyebrow">Social Performance Report</div>
+      <h1>Social Media Dashboard</h1>
+      <div class="subtitle">@almaiso.tenerife · Instagram &amp; Facebook</div>
+    </div>
+  </div>
+  <div class="period-badge" id="period-label">First Semester 2026</div>
+</header>
+
+<div class="platform-tabs">
+  <button class="ptab active" data-tab="feed">
+    <span class="ptab-icon">📷</span> Instagram Feed
+    <span class="ptab-count" id="tab-count-feed">35 posts</span>
+  </button>
+  <button class="ptab" data-tab="stories">
+    <span class="ptab-icon">⭕</span> Instagram Stories
+    <span class="ptab-count" id="tab-count-stories">222 stories</span>
+  </button>
+  <button class="ptab" data-tab="facebook">
+    <span class="ptab-icon">𝒇</span> Facebook
+    <span class="ptab-count" id="tab-count-fb">52 videos</span>
+  </button>
+</div>
+
+<div class="filters" id="filters">
+  <div class="fgroup">
+    <span class="flabel">Date range</span>
+    <div class="date-range">
+      <div class="date-input-wrap">
+        <span class="dinput-label">From</span>
+        <input type="date" id="date-from" value="2026-01-01" min="2026-01-01" max="2026-06-30">
+      </div>
+      <div class="date-sep">→</div>
+      <div class="date-input-wrap">
+        <span class="dinput-label">To</span>
+        <input type="date" id="date-to" value="2026-06-30" min="2026-01-01" max="2026-06-30">
+      </div>
+    </div>
+  </div>
+  <div class="fgroup">
+    <span class="flabel">Quick select</span>
+    <div class="filter-quick">
+      <button class="chip quick-chip active" data-from="2026-01-01" data-to="2026-06-30">All</button>
+      <button class="chip quick-chip" data-from="2026-01-01" data-to="2026-01-31">Jan</button>
+      <button class="chip quick-chip" data-from="2026-02-01" data-to="2026-02-28">Feb</button>
+      <button class="chip quick-chip" data-from="2026-03-01" data-to="2026-03-31">Mar</button>
+      <button class="chip quick-chip" data-from="2026-04-01" data-to="2026-04-30">Apr</button>
+      <button class="chip quick-chip" data-from="2026-05-01" data-to="2026-05-31">May</button>
+      <button class="chip quick-chip" data-from="2026-06-01" data-to="2026-06-30">Jun</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══════════ INSTAGRAM FEED ══════════ -->
+  <div class="tab-pane active" id="pane-feed">
+    <div class="kpi-row kpi-5" id="kpi-feed"></div>
+    <div class="insights" id="insights-feed"></div>
+
+    <div class="slabel">Monthly performance</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="chead"><h3>Total views &amp; engagement rate by month</h3><div class="csub">Bars = total views · Line = avg. engagement rate</div></div>
+        <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h3>New followers by month</h3><div class="csub">Accounts that followed from a post</div></div>
+        <div class="chart-wrap"><canvas id="chartFollows"></canvas></div>
+      </div>
+    </div>
+
+    <div class="slabel">Format &amp; interaction breakdown</div>
+    <div class="grid-2-even">
+      <div class="card">
+        <div class="chead"><h3>Reels vs. Carousels</h3><div class="csub">Average per post · ▲ marks the winner</div></div>
+        <div id="format-scorecard" class="scorecard"></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h3>How your audience interacts</h3><div class="csub">Total interactions across all posts</div></div>
+        <div class="chart-wrap"><canvas id="chartEngBreakdown"></canvas></div>
+      </div>
+    </div>
+
+    <div class="slabel">Top posts</div>
+    <div class="card wide">
+      <div class="chead"><h3>Top 3 · Most Views</h3></div>
+      <div class="tbl-scroll"><div id="top3-views-table"></div></div>
+    </div>
+    <div class="card wide" style="margin-top:14px">
+      <div class="chead"><h3>Top 3 · Most Follows</h3></div>
+      <div class="tbl-scroll"><div id="top3-follows-table"></div></div>
+    </div>
+    <div class="card wide" style="margin-top:14px">
+      <div class="chead"><h3>Top 3 · Most Engagement (likes)</h3></div>
+      <div class="tbl-scroll"><div id="top3-likes-table"></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ STORIES ══════════ -->
+  <div class="tab-pane" id="pane-stories">
+    <div class="kpi-row kpi-4" id="kpi-stories"></div>
+    <div class="insights" id="insights-stories"></div>
+
+    <div class="slabel">Monthly performance</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="chead"><h3>Total views by month</h3><div class="csub">Total impressions across all story frames</div></div>
+        <div class="chart-wrap"><canvas id="chartStoriesViews"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h3>Stories published by month</h3><div class="csub">Number of story frames posted</div></div>
+        <div class="chart-wrap"><canvas id="chartStoriesCount"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2-even">
+      <div class="card">
+        <div class="chead"><h3>Reach by month</h3><div class="csub">Unique accounts who saw your stories</div></div>
+        <div class="chart-wrap"><canvas id="chartStoriesReach"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h3>Reactions by month</h3><div class="csub">Likes + replies on stories</div></div>
+        <div class="chart-wrap"><canvas id="chartStoriesReactions"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FACEBOOK ══════════ -->
+  <div class="tab-pane" id="pane-facebook">
+    <div class="kpi-row kpi-4" id="kpi-fb"></div>
+    <div class="insights" id="insights-fb"></div>
+
+    <div class="slabel">Monthly performance</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="chead"><h3>3-second video views by month</h3><div class="csub">Videos watched at least 3 seconds</div></div>
+        <div class="chart-wrap"><canvas id="chartFbViews"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h3>Reach by month</h3><div class="csub">Unique people who saw a video</div></div>
+        <div class="chart-wrap"><canvas id="chartFbReach"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2-even">
+      <div class="card">
+        <div class="chead"><h3>Reactions, comments &amp; shares</h3><div class="csub">Total interactions by month</div></div>
+        <div class="chart-wrap"><canvas id="chartFbEngagement"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h3>Videos posted by month</h3><div class="csub">Number of Facebook video posts</div></div>
+        <div class="chart-wrap"><canvas id="chartFbCount"></canvas></div>
+      </div>
+    </div>
+
+    <div class="slabel">Top vídeos</div>
+    <div class="card wide">
+      <div class="chead"><h3>Top 5 vídeos por alcance</h3><div class="csub">Clique em qualquer coluna para reordenar · <span id="fb-table-count"></span></div></div>
+      <div class="tbl-scroll"><div id="top-fb-table"></div></div>
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<div class="footnote">
+  Instagram feed: engagement rate = (likes + saves + shares + comments) ÷ reach. Views = total impressions (feed &amp; stories).
+  Facebook: 3-second video views as reported by Meta. All data covers Jan–Jun 2026 · @almaiso.tenerife.
+</div>
+
+<script>
+// ─────────────── DATA ───────────────────────────────────────────────────────
+
+// Instagram Feed posts (@almaiso.tenerife only)
+const FEED_RAW = [
+  {type:"IG reel",   date:"05/30/2026",views:863,  likes:41, saves:0, shares:4,  comments:1,  reach:584,  follows:0, eng_rate:7.88,  desc:"Today we celebrate these islands. Their volcanic heart. Their silence."},
+  {type:"IG reel",   date:"05/27/2026",views:1418, likes:80, saves:1, shares:2,  comments:9,  reach:737,  follows:0, eng_rate:12.48, desc:"You wondered who cares for the land here: we do not do it alone!"},
+  {type:"IG carousel",date:"05/21/2026",views:941, likes:39, saves:1, shares:3,  comments:5,  reach:369,  follows:0, eng_rate:13.01, desc:"Your nervous system notices everything. The light that wakes you."},
+  {type:"IG reel",   date:"05/13/2026",views:1319, likes:23, saves:1, shares:4,  comments:3,  reach:822,  follows:1, eng_rate:3.77,  desc:"As retreat leaders, you carry so much. The vision. The group."},
+  {type:"IG reel",   date:"05/09/2026",views:1640, likes:56, saves:0, shares:1,  comments:1,  reach:953,  follows:1, eng_rate:6.09,  desc:"You wondered what it feels like here. @fromwithin.aga speaks of what the space made possible."},
+  {type:"IG carousel",date:"05/04/2026",views:2365, likes:71, saves:2, shares:5, comments:7,  reach:764,  follows:1, eng_rate:11.13, desc:"Behind Almaiso, there is Alex. An entrepreneur, a father."},
+  {type:"IG reel",   date:"05/02/2026",views:868,  likes:43, saves:0, shares:0,  comments:1,  reach:537,  follows:0, eng_rate:8.19,  desc:"Welcome to Casa Julian. Tucked within the palm garden."},
+  {type:"IG carousel",date:"04/28/2026",views:1728, likes:70, saves:1, shares:9, comments:4,  reach:649,  follows:0, eng_rate:12.94, desc:"Not so far from Europe, there is an island. A place where the weather softens."},
+  {type:"IG reel",   date:"04/22/2026",views:2414, likes:134,saves:4, shares:17, comments:8,  reach:1470, follows:3, eng_rate:11.09, desc:"Earth Day. For many, it's a reminder. For us, it's a daily practice."},
+  {type:"IG reel",   date:"04/15/2026",views:2867, likes:128,saves:5, shares:15, comments:20, reach:1623, follows:11,eng_rate:10.35, desc:"Almaiso is a paradise for the soul. A place where retreats unfold."},
+  {type:"IG carousel",date:"04/07/2026",views:1335, likes:52, saves:0, shares:0, comments:10, reach:446,  follows:0, eng_rate:13.9,  desc:"Long before Almaiso's vision was born, there was someone already caring."},
+  {type:"IG reel",   date:"04/02/2026",views:1044, likes:39, saves:1, shares:0,  comments:1,  reach:634,  follows:0, eng_rate:6.47,  desc:"There's something nature never gets wrong: its cycles."},
+  {type:"IG reel",   date:"03/29/2026",views:1122, likes:54, saves:7, shares:2,  comments:2,  reach:687,  follows:0, eng_rate:9.46,  desc:"Casas of Almaiso — Welcome to our collection of homes."},
+  {type:"IG reel",   date:"03/25/2026",views:1127, likes:28, saves:0, shares:1,  comments:7,  reach:667,  follows:0, eng_rate:5.4,   desc:"There is a different kind of ease when you arrive supported."},
+  {type:"IG carousel",date:"03/18/2026",views:783,  likes:16, saves:1, shares:1, comments:0,  reach:337,  follows:0, eng_rate:5.34,  desc:"The Spring Equinox is here, a moment when day and night are equal."},
+  {type:"IG carousel",date:"03/15/2026",views:1469, likes:63, saves:5, shares:0, comments:4,  reach:657,  follows:1, eng_rate:10.96, desc:"It is no coincidence that Tenerife is Almaiso's home."},
+  {type:"IG reel",   date:"03/10/2026",views:2711, likes:106,saves:9, shares:21, comments:22, reach:1621, follows:5, eng_rate:9.75,  desc:"In Almaiso, everything begins with the land. Almaiso Verde is our permaculture project."},
+  {type:"IG carousel",date:"03/08/2026",views:2682, likes:63, saves:1, shares:7, comments:4,  reach:1126, follows:0, eng_rate:6.66,  desc:"Today we honor the power of women gathering."},
+  {type:"IG carousel",date:"03/06/2026",views:1866, likes:61, saves:1, shares:1, comments:9,  reach:612,  follows:1, eng_rate:11.76, desc:"Behind Almaiso stands Stefan, entrepreneur, father, and visionary."},
+  {type:"IG reel",   date:"03/05/2026",views:573,  likes:23, saves:0, shares:0,  comments:1,  reach:367,  follows:0, eng_rate:6.54,  desc:"A space to soften. A space to restore. Just beside the shala."},
+  {type:"IG carousel",date:"02/26/2026",views:1474, likes:31, saves:3, shares:5, comments:5,  reach:579,  follows:1, eng_rate:7.6,   desc:"INTERNATIONAL WOMEN'S DAY - CHARITY EVENT with Simona and Anne-Lise."},
+  {type:"IG reel",   date:"02/24/2026",views:1900, likes:45, saves:1, shares:2,  comments:9,  reach:1182, follows:0, eng_rate:4.82,  desc:"Almaiso is built by many hands. Every corner, every garden path."},
+  {type:"IG carousel",date:"02/19/2026",views:1855, likes:23, saves:5, shares:7, comments:7,  reach:835,  follows:1, eng_rate:5.03,  desc:"WILD FEMININE RETREAT with @thewildfem."},
+  {type:"IG carousel",date:"02/16/2026",views:1733, likes:45, saves:5, shares:2, comments:9,  reach:749,  follows:2, eng_rate:8.14,  desc:"Holding a retreat at Casa Enna carries its own quiet magic."},
+  {type:"IG reel",   date:"02/10/2026",views:1373, likes:48, saves:2, shares:4,  comments:6,  reach:823,  follows:3, eng_rate:7.29,  desc:"Almaiso veggie box: fresh from the field to your plate."},
+  {type:"IG carousel",date:"02/06/2026",views:2014, likes:33, saves:4, shares:0, comments:2,  reach:754,  follows:0, eng_rate:5.17,  desc:"Journey Through Chakras - a Yoga and Adventure Retreat with Aga."},
+  {type:"IG reel",   date:"02/03/2026",views:2280, likes:63, saves:4, shares:13, comments:7,  reach:1231, follows:5, eng_rate:7.07,  desc:"Our Yoga Hall invites people to connect, letting the body soften."},
+  {type:"IG carousel",date:"01/30/2026",views:2518, likes:27, saves:2, shares:3, comments:9,  reach:878,  follows:1, eng_rate:4.67,  desc:"Full Moon Gathering at Almaiso. Under the light of the full moon."},
+  {type:"IG reel",   date:"01/29/2026",views:1997, likes:29, saves:1, shares:7,  comments:4,  reach:1275, follows:4, eng_rate:3.22,  desc:"What if connection is what brings us home to ourselves?"},
+  {type:"IG carousel",date:"01/26/2026",views:3217, likes:64, saves:3, shares:12, comments:9, reach:1242, follows:4, eng_rate:7.09,  desc:"Alma en Canto is a community singing circle held by the Almaiso community."},
+  {type:"IG reel",   date:"01/21/2026",views:2457, likes:51, saves:5, shares:10, comments:2,  reach:1341, follows:3, eng_rate:5.07,  desc:"Joy doesn't grow in isolation. It expands when we are surrounded."},
+  {type:"IG carousel",date:"01/18/2026",views:1683, likes:23, saves:4, shares:5, comments:12, reach:621,  follows:0, eng_rate:7.09,  desc:"An invitation for women to embody their truth."},
+  {type:"IG reel",   date:"01/14/2026",views:2470, likes:96, saves:16,shares:8,  comments:5,  reach:1358, follows:10,eng_rate:9.2,   desc:"A space that invites stillness and holds movement with care."},
+  {type:"IG carousel",date:"01/11/2026",views:1442, likes:20, saves:2, shares:3, comments:4,  reach:607,  follows:0, eng_rate:4.78,  desc:"Breathwork Healing Circle with @nicolarohner.breathwork."},
+  {type:"IG reel",   date:"01/01/2026",views:1944, likes:35, saves:3, shares:3,  comments:0,  reach:1196, follows:1, eng_rate:3.43,  desc:"A new year opens a new cycle. A moment to plant seeds."}
+];
+
+// Instagram Stories — aggregated by month from CSV export
+const STORIES = {
+  '01':{count:56, views:11093, reach:8258, likes:140, replies:10},
+  '02':{count:33, views:6606,  reach:4989, likes:85,  replies:6},
+  '03':{count:26, views:3276,  reach:2447, likes:66,  replies:8},
+  '04':{count:62, views:10556, reach:7898, likes:147, replies:11},
+  '05':{count:44, views:8251,  reach:6075, likes:187, replies:15},
+  '06':{count:1,  views:115,   reach:87,   likes:3,   replies:0}
+};
+
+// Facebook — aggregated by month from CSV export (Almaiso at Finca El Drago page)
+const FB = {
+  '01':{count:6,  reach:159,  views3:68,  reactions:0,  comments:0, shares:0},
+  '02':{count:7,  reach:593,  views3:353, reactions:6,  comments:2, shares:0},
+  '03':{count:11, reach:738,  views3:358, reactions:15, comments:0, shares:0},
+  '04':{count:17, reach:934,  views3:551, reactions:16, comments:2, shares:0},
+  '05':{count:11, reach:1502, views3:579, reactions:14, comments:2, shares:3}
+};
+
+// Facebook — individual video posts (only posts with meaningful reach, from CSV)
+const FB_POSTS = [
+  {date:"01/29/2026", reach:145, views3:62,  reactions:0, comments:0, shares:0},
+  {date:"02/03/2026", reach:217, views3:129, reactions:3,  comments:0, shares:0},
+  {date:"02/10/2026", reach:185, views3:77,  reactions:2,  comments:2, shares:0},
+  {date:"02/24/2026", reach:186, views3:107, reactions:1,  comments:0, shares:0},
+  {date:"03/10/2026", reach:169, views3:72,  reactions:5,  comments:0, shares:0},
+  {date:"03/24/2026", reach:134, views3:40,  reactions:1,  comments:0, shares:0},
+  {date:"03/25/2026", reach:202, views3:91,  reactions:4,  comments:0, shares:0},
+  {date:"03/29/2026", reach:219, views3:96,  reactions:4,  comments:0, shares:0},
+  {date:"04/02/2026", reach:401, views3:196, reactions:6,  comments:0, shares:0},
+  {date:"04/15/2026", reach:148, views3:89,  reactions:3,  comments:0, shares:0},
+  {date:"04/22/2026", reach:380, views3:158, reactions:7,  comments:2, shares:0},
+  {date:"05/02/2026", reach:277, views3:88,  reactions:0,  comments:0, shares:0},
+  {date:"05/09/2026", reach:257, views3:105, reactions:5,  comments:2, shares:1},
+  {date:"05/13/2026", reach:86,  views3:46,  reactions:3,  comments:0, shares:1},
+  {date:"05/27/2026", reach:502, views3:217, reactions:4,  comments:0, shares:0},
+  {date:"05/27/2026", reach:151, views3:59,  reactions:0,  comments:0, shares:0},
+  {date:"05/30/2026", reach:226, views3:57,  reactions:2,  comments:0, shares:1}
+];
+
+const MONTHS     = [['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun']];
+const MONTH_FULL = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June'};
+
+const C = {
+  reel:'#636E42', carousel:'#C1803F', ink:'#454B32', inkSoft:'#6D6A52',
+  grid:'rgba(69,75,50,0.10)', surface:'#FBF6EF',
+  likes:'#965032', saves:'#C1803F', shares:'#7E8B57', comments:'#D5B174',
+  story:'#4D5536', fb:'#636E42'
+};
+
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = C.inkSoft;
+
+// ─────────────── STATE ──────────────────────────────────────────────────────
+let dateFrom = new Date('2026-01-01');
+let dateTo   = new Date('2026-06-30');
+let activeTab = 'feed';
+let charts = {};
+const tableState = { key:'reach', dir:-1 };
+const fbTableState = { key:'reach', dir:-1 };
+
+function fmt(n){ n=Math.round(n); return n>=10000?(n/1000).toFixed(0)+'k':n.toLocaleString('en-US'); }
+function avg(arr,k){ return arr.length?+(arr.reduce((s,d)=>s+d[k],0)/arr.length).toFixed(1):0; }
+function dc(id){ if(charts[id]){charts[id].destroy();delete charts[id];} }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Parse MM/DD/YYYY → Date
+function parsePostDate(str){
+  const [m,d,y] = str.split('/');
+  return new Date(+y, +m-1, +d);
+}
+// Month key '01'-'06' → within range?
+function monthInRange(mo){
+  const start = new Date(2026, +mo-1, 1);
+  const end   = new Date(2026, +mo-1+1, 0); // last day of month
+  return start <= dateTo && end >= dateFrom;
+}
+
+function getFeedData(){
+  return FEED_RAW.filter(d => {
+    const pd = parsePostDate(d.date);
+    return pd >= dateFrom && pd <= dateTo;
+  });
+}
+function getStoriesData(){
+  return Object.fromEntries(
+    Object.entries(STORIES).filter(([mo]) => monthInRange(mo))
+  );
+}
+function getFbData(){
+  return Object.fromEntries(
+    Object.entries(FB).filter(([mo]) => monthInRange(mo))
+  );
+}
+// Which MONTHS array entries are in range
+function getMonthsInRange(){
+  return MONTHS.filter(([m]) => monthInRange(m));
+}
+
+function periodLabel(){
+  const same = dateFrom.getTime()===new Date('2026-01-01T00:00:00').getTime() && dateTo.getTime()===new Date('2026-06-30T23:59:59').getTime();
+  if(same) return 'First Semester 2026';
+  const f=dateFrom, t=dateTo;
+  const fmtD=d=>`${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]}`;
+  return `${fmtD(f)} – ${fmtD(t)} 2026`;
+}
+
+function tipStyle(labelFn){
+  return {backgroundColor:'#454B32',titleColor:'#FBF6EF',bodyColor:'#F2E8D3',padding:10,
+    cornerRadius:6,titleFont:{weight:'500'},displayColors:false,callbacks:{label:labelFn}};
+}
+function gridScale(extra={}){ return Object.assign({grid:{color:C.grid},border:{display:false},ticks:{padding:6}},extra); }
+function barOpts(labelFn){ return {responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:tipStyle(labelFn)},
+  scales:{y:gridScale({ticks:{padding:6,callback:v=>v>=1000?(v/1000)+'k':v}}),x:{grid:{display:false},border:{display:false},ticks:{padding:6}}}}; }
+
+// ─────────────── TABS ───────────────────────────────────────────────────────
+function initTabs(){
+  document.querySelectorAll('.ptab').forEach(btn=>{
+    btn.onclick=()=>{
+      activeTab=btn.dataset.tab;
+      document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+      document.getElementById('pane-'+activeTab).classList.add('active');
+      render();
+    };
+  });
+}
+
+// ─────────────── FILTERS ────────────────────────────────────────────────────
+function initFilters(){
+  const fromEl = document.getElementById('date-from');
+  const toEl   = document.getElementById('date-to');
+
+  function applyDates(){
+    dateFrom = new Date(fromEl.value + 'T00:00:00');
+    dateTo   = new Date(toEl.value   + 'T23:59:59');
+    // sync quick chips
+    document.querySelectorAll('.quick-chip').forEach(c=>{
+      c.classList.toggle('active',
+        c.dataset.from===fromEl.value && c.dataset.to===toEl.value);
+    });
+    document.getElementById('period-label').textContent = periodLabel();
+    render();
+  }
+
+  fromEl.addEventListener('change', applyDates);
+  toEl.addEventListener('change',   applyDates);
+
+  document.querySelectorAll('.quick-chip').forEach(btn=>{
+    btn.onclick=()=>{
+      fromEl.value = btn.dataset.from;
+      toEl.value   = btn.dataset.to;
+      applyDates();
+    };
+  });
+}
+
+// ─────────────── FEED TAB ───────────────────────────────────────────────────
+function renderFeed(){
+  const data = getFeedData();
+  // KPIs
+  const wr  = data.filter(d=>d.reach>0);
+  const ar  = wr.length?(wr.reduce((s,d)=>s+d.eng_rate,0)/wr.length).toFixed(1):'—';
+  const sum = k=>data.reduce((s,d)=>s+d[k],0);
+  const avgViews  = data.length ? fmt(Math.round(sum('views')/data.length)) : '—';
+  const avgReach  = wr.length   ? fmt(Math.round(wr.reduce((s,d)=>s+d.reach,0)/wr.length)) : '—';
+  const months    = [...new Set(data.map(d=>d.date.substring(0,2)))].length || 1;
+  const avgFollowsPerMonth = fmt(Math.round(sum('follows')/months));
+  document.getElementById('kpi-feed').innerHTML=`
+    <div class="kpi hero">
+      <div class="val">${fmt(sum('views'))}</div>
+      <div class="lbl">Total views</div>
+      <div class="sub">${data.length} post${data.length!==1?'s':''} published</div>
+      <div class="sub" style="margin-top:4px">avg. <strong>${avgViews}</strong> views/post</div>
+    </div>
+    <div class="kpi"><div class="val">${fmt(sum('reach'))}</div><div class="lbl">Total reach</div><div class="sub">avg. <strong>${avgReach}</strong> reach/post</div></div>
+    <div class="kpi"><div class="val">${fmt(sum('follows'))}</div><div class="lbl">New followers</div><div class="sub">avg. <strong>${avgFollowsPerMonth}</strong>/month</div></div>
+    <div class="kpi"><div class="val">${ar}${ar!=='—'?'%':''}</div><div class="lbl">Avg. eng. rate</div><div class="sub">Posts with reach data</div></div>
+    <div class="kpi"><div class="val">${fmt(sum('likes'))}</div><div class="lbl">Total likes</div><div class="sub">${fmt(sum('saves'))} saves · ${fmt(sum('shares'))} shares</div></div>`;
+
+  // Insights
+  const reels=data.filter(d=>d.type==='IG reel'), cars=data.filter(d=>d.type==='IG carousel');
+  const rv=avg(reels,'views'), cv=avg(cars,'views');
+  const re=avg(reels.filter(d=>d.reach>0),'eng_rate'), ce=avg(cars.filter(d=>d.reach>0),'eng_rate');
+  const moOf2=d=>d.date.substring(0,2);
+  const byM={}; data.forEach(d=>{const m=moOf2(d);byM[m]=(byM[m]||0)+d.views;});
+  const bm=Object.entries(byM).sort((a,b)=>b[1]-a[1])[0];
+  const byF={}; data.forEach(d=>{const m=moOf2(d);byF[m]=(byF[m]||0)+d.follows;});
+  const bf=Object.entries(byF).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('insights-feed').innerHTML=`
+    <div class="ins-head"><h3>What the numbers say</h3><span class="ins-sub">Key takeaways for your strategy</span></div>
+    <div class="insights-grid">
+      <div class="insight-item"><div class="ihead">Best format for reach</div><div class="itext">${rv>=cv?`Reels reach further — <strong>${fmt(rv)}</strong> avg. plays vs. <strong>${fmt(cv)}</strong> for carousels.`:`Carousels reach further — <strong>${fmt(cv)}</strong> avg. plays vs. <strong>${fmt(rv)}</strong> for reels.`}</div></div>
+      <div class="insight-item"><div class="ihead">Best format for engagement</div><div class="itext">${ce>=re?`Carousels hold attention — <strong>${ce}%</strong> eng. rate vs. <strong>${re}%</strong> for reels.`:`Reels spark interaction — <strong>${re}%</strong> eng. rate vs. <strong>${ce}%</strong> for carousels.`}</div></div>
+      <div class="insight-item"><div class="ihead">Best month &amp; growth</div><div class="itext">${bm?`<strong>${MONTH_FULL[bm[0]]}</strong> was the strongest month with <strong>${fmt(bm[1])}</strong> total plays.${bf?` Most followers came in <strong>${MONTH_FULL[bf[0]]}</strong> (${bf[1]}).`:''}`:' Not enough data.'}</div></div>
+    </div>`;
+
+  // Monthly combo chart
+  dc('m');
+  const pres=getMonthsInRange().filter(([m])=>FEED_RAW.some(d=>d.date.startsWith(m+'/')));
+  const labels=pres.map(x=>x[1]);
+  const moOf=d=>d.date.substring(0,2);
+  const vv=pres.map(([m])=>data.filter(d=>moOf(d)===m).reduce((s,d)=>s+d.views,0));
+  const ee=pres.map(([m])=>{const p=data.filter(d=>moOf(d)===m&&d.reach>0);return p.length?+(p.reduce((s,d)=>s+d.eng_rate,0)/p.length).toFixed(1):null;});
+  const pc=pres.map(([m])=>data.filter(d=>moOf(d)===m).length);
+  charts['m']=new Chart(document.getElementById('chartMonthly'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Total views',data:vv,backgroundColor:'rgba(193,128,63,0.85)',hoverBackgroundColor:C.carousel,borderRadius:5,maxBarThickness:46,yAxisID:'y',order:3},
+      {type:'line',label:'Eng. rate %',data:ee,borderColor:C.reel,backgroundColor:C.reel,pointRadius:4,pointHoverRadius:7,borderWidth:2.5,tension:.3,yAxisID:'y2',spanGaps:true,order:1},
+      {type:'line',label:'# Posts',data:pc,borderColor:'rgba(77,85,54,0.7)',backgroundColor:'rgba(77,85,54,0.7)',pointRadius:4,pointHoverRadius:7,borderWidth:2,borderDash:[4,3],tension:.3,yAxisID:'y3',order:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,padding:14}},
+        tooltip:tipStyle(ctx=>ctx.dataset.yAxisID==='y2'?ctx.parsed.y+'%':ctx.dataset.yAxisID==='y3'?ctx.parsed.y+' posts':fmt(ctx.parsed.y)+' views')},
+      scales:{y:gridScale({ticks:{padding:6,callback:v=>v>=1000?(v/1000)+'k':v}}),
+        y2:{position:'right',grid:{display:false},border:{display:false},ticks:{padding:6,callback:v=>v+'%'},suggestedMin:0},
+        y3:{position:'right',grid:{display:false},border:{display:false},ticks:{padding:6,callback:v=>v+' p'},suggestedMin:0,offset:true},
+        x:{grid:{display:false},border:{display:false},ticks:{padding:6}}}}
+  });
+
+  // Follows chart
+  dc('f');
+  const fv=pres.map(([m])=>data.filter(d=>moOf(d)===m).reduce((s,d)=>s+d.follows,0));
+  charts['f']=new Chart(document.getElementById('chartFollows'),{type:'bar',
+    data:{labels,datasets:[{label:'New followers',data:fv,backgroundColor:'rgba(150,80,50,0.82)',hoverBackgroundColor:'#965032',borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>ctx.parsed.y+' new follower'+(ctx.parsed.y===1?'':'s'))
+  });
+
+  // Engagement doughnut
+  dc('eb');
+  const t={Likes:data.reduce((s,d)=>s+d.likes,0),Saves:data.reduce((s,d)=>s+d.saves,0),Shares:data.reduce((s,d)=>s+d.shares,0),Comments:data.reduce((s,d)=>s+d.comments,0)};
+  const tot=Object.values(t).reduce((s,v)=>s+v,0);
+  charts['eb']=new Chart(document.getElementById('chartEngBreakdown'),{type:'doughnut',
+    data:{labels:Object.keys(t),datasets:[{data:Object.values(t),backgroundColor:[C.likes,C.saves,C.shares,C.comments],borderWidth:3,borderColor:C.surface,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:9,boxHeight:9,usePointStyle:true,padding:11}},
+        tooltip:tipStyle(ctx=>ctx.parsed+' ('+(tot?Math.round(ctx.parsed/tot*100):0)+'%)')}}
+  });
+
+  // Format scorecard
+  const rows=[
+    {m:'Avg. views',r:avg(reels,'views'),c:avg(cars,'views'),fmt:fmt},
+    {m:'Avg. reach',r:avg(reels,'reach'),c:avg(cars,'reach'),fmt:fmt},
+    {m:'Avg. likes',r:avg(reels,'likes'),c:avg(cars,'likes'),fmt:v=>Math.round(v).toString()},
+    {m:'Avg. saves',r:avg(reels,'saves'),c:avg(cars,'saves'),fmt:v=>v.toFixed(1)},
+    {m:'Avg. shares',r:avg(reels,'shares'),c:avg(cars,'shares'),fmt:v=>v.toFixed(1)},
+    {m:'Avg. eng. rate',r:avg(reels.filter(d=>d.reach>0),'eng_rate'),c:avg(cars.filter(d=>d.reach>0),'eng_rate'),fmt:v=>v.toFixed(1)+'%'}
+  ];
+  const sc=`<div class="sc-head"><span>Per post avg.</span><span class="col"><span class="dot" style="background:${C.reel}"></span>Reels (${reels.length})</span><span class="col"><span class="dot" style="background:${C.carousel}"></span>Carousels (${cars.length})</span></div>`
+    +rows.map(row=>{const rW=row.r>row.c,cW=row.c>row.r;
+      return `<div class="sc-row"><span class="metric">${row.m}</span><span class="v ${rW?'win':''}">${row.fmt(row.r)}${rW?'<span class="tick"> ▲</span>':''}</span><span class="v ${cW?'win':''}">${row.fmt(row.c)}${cW?'<span class="tick"> ▲</span>':''}</span></div>`;}).join('');
+  document.getElementById('format-scorecard').innerHTML=sc;
+
+  // Table
+  renderTop3Tables(data);
+}
+
+// ─────────────── TOP 3 LIST ──────────────────────────────────────────────────
+function renderTop3(data){
+  const PERIODS = [
+    { label:'All', key:'all' },
+    { label:'Jan', key:'01' }, { label:'Feb', key:'02' }, { label:'Mar', key:'03' },
+    { label:'Apr', key:'04' }, { label:'May', key:'05' }, { label:'Jun', key:'06' }
+  ];
+  const SECTIONS = [
+    { id:'top3-engagement', title:'Top 3 posts with most engagement', chip:'engagement', key:'engagement', unit: v => fmt(v)+' eng.' },
+    { id:'top3-reach',      title:'Top 3 posts with most views',      chip:'views',      key:'views',      unit: v => fmt(v)+' views' },
+    { id:'top3-followers',  title:'Top 3 posts that brought followers', chip:'followers', key:'follows',    unit: v => v+' follow'+(v===1?'':'s') }
+  ];
+
+  SECTIONS.forEach(sec => {
+    const rowsHtml = PERIODS.map(per => {
+      const posts = per.key === 'all'
+        ? [...data]
+        : data.filter(d => d.date.startsWith(per.key + '/'));
+
+      const top3 = [...posts]
+        .filter(d => d[sec.key] > 0)
+        .sort((a, b) => b[sec.key] - a[sec.key])
+        .slice(0, 3);
+
+      const isAll = per.key === 'all';
+
+      // Summary block (All column only)
+      const wr = posts.filter(d => d.reach > 0);
+      const summaryHtml = isAll ? `<div class="top3-summary">
+        <div class="top3-sum-row"><span class="top3-sum-lbl">Total Reach</span><span class="top3-sum-val">${fmt(posts.reduce((s,d)=>s+d.reach,0))}</span></div>
+        <div class="top3-sum-row"><span class="top3-sum-lbl">Avg Views</span><span class="top3-sum-val">${posts.length?fmt(Math.round(posts.reduce((s,d)=>s+d.views,0)/posts.length)):0}</span></div>
+        <div class="top3-sum-row"><span class="top3-sum-lbl">Avg Reach</span><span class="top3-sum-val">${wr.length?fmt(Math.round(wr.reduce((s,d)=>s+d.reach,0)/wr.length)):0}</span></div>
+        <div class="top3-sum-row"><span class="top3-sum-lbl">New Followers</span><span class="top3-sum-val">${posts.reduce((s,d)=>s+d.follows,0)}</span></div>
+      </div>` : '';
+
+      // Post items
+      const itemsHtml = top3.length
+        ? top3.map((d, i) => {
+            const badge = d.type === 'IG reel'
+              ? '<span class="badge badge-reel">Reel</span>'
+              : '<span class="badge badge-carousel">Carousel</span>';
+            const snippet = d.desc ? esc(d.desc.substring(0, 80)) : '(no caption)';
+            return `<div class="top3-item">
+              <span class="top3-item-rank">#${i+1}</span>
+              <div class="top3-item-body">
+                <div class="top3-item-score">${sec.unit(d[sec.key])}</div>
+                <div class="top3-item-desc">${snippet}</div>
+                <div class="top3-item-meta">${badge}<span class="top3-item-date">${d.date}</span></div>
+              </div>
+            </div>`;
+          }).join('')
+        : '<div class="top3-empty">No data for this period</div>';
+
+      return `<div class="top3-list-row${isAll?' is-all':''}">
+        <div class="top3-period-col">
+          <div class="top3-period-name${isAll?' is-all':''}">${per.label}</div>
+          ${summaryHtml}
+        </div>
+        <div class="top3-items-col">${itemsHtml}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById(sec.id).innerHTML = `
+      <div class="top3-list-title">${sec.title} <span class="metric-chip">${sec.chip}</span></div>
+      <div class="top3-list-table">${rowsHtml}</div>`;
+  });
+}
+
+// ─────────────── TOP 3 TABLES ────────────────────────────────────────────────
+const COLS=[
+  {key:'rank',h:'#',cls:'rank',render:(d,i)=>i+1},
+  {key:'date',h:'Date',cls:'num',render:d=>d.date},
+  {key:'type',h:'Format',render:d=>`<span class="badge ${d.type==='IG reel'?'badge-reel':'badge-carousel'}">${d.type.replace('IG ','')}</span>`},
+  {key:'desc',h:'Caption',render:d=>`<span class="desc" title="${esc(d.desc)}">${esc(d.desc.substring(0,80))}…</span>`},
+  {key:'views',h:'Views',cls:'num',render:d=>`<span class="strong-v">${fmt(d.views)}</span>`},
+  {key:'reach',h:'Reach',cls:'num',render:d=>fmt(d.reach)||'—'},
+  {key:'eng_rate',h:'Eng. rate',cls:'num',render:d=>d.reach>0?`<span class="rate-v">${d.eng_rate}%</span>`:'—'},
+  {key:'follows',h:'Follows',cls:'num',render:d=>d.follows||'—'},
+  {key:'likes',h:'Likes',cls:'num',render:d=>d.likes},
+  {key:'saves',h:'Saves',cls:'num',render:d=>d.saves},
+  {key:'shares',h:'Shares',cls:'num',render:d=>d.shares||'—'},
+  {key:'comments',h:'Comments',cls:'num',render:d=>d.comments||'—'}
+];
+
+function buildTable(rows) {
+  const ths = COLS.map(c=>`<th class="no-sort ${c.cls||''}">${c.h}</th>`).join('');
+  const trs = rows.map((d,i)=>`<tr>${COLS.map(c=>`<td class="${c.cls||''}">${c.render(d,i)}</td>`).join('')}</tr>`).join('');
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+}
+
+function renderTop3Tables(data) {
+  const top3by = key => [...data].sort((a,b)=>b[key]-a[key]).slice(0,3);
+
+  document.getElementById('top3-views-table').innerHTML   = buildTable(top3by('views'));
+  document.getElementById('top3-follows-table').innerHTML = buildTable(top3by('follows'));
+  document.getElementById('top3-likes-table').innerHTML   = buildTable(top3by('likes'));
+}
+
+// ─────────────── FACEBOOK POSTS TABLE ──────────────────────────────────────
+function getFbPosts(){
+  return FB_POSTS.filter(d=>{
+    const pd=parsePostDate(d.date);
+    return pd>=dateFrom && pd<=dateTo;
+  });
+}
+
+const FB_COLS=[
+  {key:'rank',h:'#',sortable:false,cls:'rank',render:(d,i)=>i+1},
+  {key:'date',h:'Date',cls:'num',sortVal:d=>+(d.date.substring(6)+d.date.substring(0,2)+d.date.substring(3,5)),render:d=>d.date},
+  {key:'reach',h:'Reach',cls:'num',sortVal:d=>d.reach,render:d=>`<span class="strong-v">${fmt(d.reach)}</span>`},
+  {key:'views3',h:'3-sec views',cls:'num',sortVal:d=>d.views3,render:d=>fmt(d.views3)},
+  {key:'reactions',h:'Reactions',cls:'num',sortVal:d=>d.reactions,render:d=>d.reactions||'—'},
+  {key:'comments',h:'Comments',cls:'num',sortVal:d=>d.comments,render:d=>d.comments||'—'},
+  {key:'shares',h:'Shares',cls:'num',sortVal:d=>d.shares,render:d=>d.shares||'—'}
+];
+function renderFbTable(data){
+  const st=fbTableState, col=FB_COLS.find(c=>c.key===st.key)||FB_COLS[2];
+  const sorted=[...data].sort((a,b)=>{const va=col.sortVal(a),vb=col.sortVal(b);return typeof va==='string'?st.dir*va.localeCompare(vb):st.dir*(va-vb);});
+  const rows=sorted.slice(0,5);
+  const ths=FB_COLS.map(c=>{if(c.sortable===false)return `<th class="no-sort ${c.cls||''}">${c.h}</th>`;
+    const iS=st.key===c.key;return `<th class="${c.cls||''} ${iS?'sorted':''}" data-key="${c.key}">${c.h}<span class="arrow">${iS?(st.dir<0?'▼':'▲'):'▾'}</span></th>`;}).join('');
+  const trs=rows.map((d,i)=>`<tr>${FB_COLS.map(c=>`<td class="${c.cls||''}">${c.render(d,i)}</td>`).join('')}</tr>`).join('');
+  document.getElementById('top-fb-table').innerHTML=`<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  const countEl=document.getElementById('fb-table-count');
+  if(countEl) countEl.textContent=`Top ${rows.length} de ${data.length} vídeo${data.length!==1?'s':''}`;
+  document.querySelectorAll('#top-fb-table th[data-key]').forEach(th=>{
+    th.onclick=()=>{const k=th.dataset.key;if(st.key===k)st.dir*=-1;else{st.key=k;st.dir=-1;}renderFbTable(getFbPosts());};
+  });
+}
+
+// ─────────────── STORIES TAB ────────────────────────────────────────────────
+function renderStories(){
+  const sd=getStoriesData();
+  const months=Object.keys(sd).sort();
+  const total=(k)=>months.reduce((s,m)=>s+(sd[m]?sd[m][k]:0),0);
+  const totalViews=total('views'), totalReach=total('reach'), totalLikes=total('likes');
+  const totalReplies=total('replies'), totalCount=total('count');
+  const avgViews=totalCount?Math.round(totalViews/totalCount):0;
+
+  // KPIs
+  document.getElementById('kpi-stories').innerHTML=`
+    <div class="kpi hero">
+      <div class="val">${fmt(totalViews)}</div>
+      <div class="lbl">Total story views</div>
+      <div class="sub">${totalCount} stories published</div>
+    </div>
+    <div class="kpi"><div class="val">${fmt(totalReach)}</div><div class="lbl">Total reach</div><div class="sub">Unique accounts</div></div>
+    <div class="kpi"><div class="val">${fmt(totalLikes)}</div><div class="lbl">Story likes</div><div class="sub">${totalReplies} replies</div></div>
+    <div class="kpi"><div class="val">${fmt(avgViews)}</div><div class="lbl">Avg. views/story</div><div class="sub">Per story frame</div></div>`;
+
+  // Insights
+  const bestViewsMonth=months.sort((a,b)=>(sd[b]?.views||0)-(sd[a]?.views||0))[0];
+  const bestCountMonth=months.sort((a,b)=>(sd[b]?.count||0)-(sd[a]?.count||0))[0];
+  months.sort();
+  document.getElementById('insights-stories').innerHTML=`
+    <div class="ins-head"><h3>What the numbers say</h3><span class="ins-sub">Stories overview — @almaiso.tenerife</span></div>
+    <div class="insights-grid">
+      <div class="insight-item"><div class="ihead">Volume</div><div class="itext"><strong>${totalCount}</strong> story frames published. Most active month: <strong>${MONTH_FULL[bestCountMonth]}</strong> (${sd[bestCountMonth]?.count} stories).</div></div>
+      <div class="insight-item"><div class="ihead">Best reach month</div><div class="itext"><strong>${MONTH_FULL[bestViewsMonth]}</strong> had the most views with <strong>${fmt(sd[bestViewsMonth]?.views||0)}</strong> total impressions and <strong>${fmt(sd[bestViewsMonth]?.reach||0)}</strong> reach.</div></div>
+      <div class="insight-item"><div class="ihead">Engagement</div><div class="itext"><strong>${fmt(totalLikes)}</strong> total likes and <strong>${totalReplies}</strong> replies across all stories. Avg. <strong>${fmt(avgViews)}</strong> views per story frame.</div></div>
+    </div>`;
+
+  // Charts
+  const allMonths=getMonthsInRange().filter(([m])=>m in STORIES);
+  const labels=allMonths.map(x=>x[1]);
+  const mkData=(k)=>allMonths.map(([m])=>sd[m]?sd[m][k]:0);
+
+  dc('sv');
+  const sc2=allMonths.map(([m])=>sd[m]?sd[m].count:0);
+  charts['sv']=new Chart(document.getElementById('chartStoriesViews'),{
+    data:{labels,datasets:[
+      {type:'bar',label:'Story views',data:mkData('views'),backgroundColor:'rgba(77,85,54,0.82)',hoverBackgroundColor:C.story,borderRadius:5,maxBarThickness:46,yAxisID:'y',order:2},
+      {type:'line',label:'# Stories',data:sc2,borderColor:'rgba(193,128,63,0.9)',backgroundColor:'rgba(193,128,63,0.9)',pointRadius:4,pointHoverRadius:7,borderWidth:2,borderDash:[4,3],tension:.3,yAxisID:'y2',order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,padding:14}},
+        tooltip:tipStyle(ctx=>ctx.dataset.yAxisID==='y2'?ctx.parsed.y+' stories':fmt(ctx.parsed.y)+' views')},
+      scales:{y:gridScale({ticks:{padding:6,callback:v=>v>=1000?(v/1000)+'k':v}}),
+        y2:{position:'right',grid:{display:false},border:{display:false},ticks:{padding:6,callback:v=>v+' s'},suggestedMin:0},
+        x:{grid:{display:false},border:{display:false},ticks:{padding:6}}}}
+  });
+
+  dc('sc');
+  charts['sc']=new Chart(document.getElementById('chartStoriesCount'),{type:'bar',
+    data:{labels,datasets:[{label:'Stories posted',data:mkData('count'),backgroundColor:'rgba(193,128,63,0.75)',hoverBackgroundColor:C.carousel,borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>ctx.parsed.y+' stories')});
+
+  dc('sr');
+  charts['sr']=new Chart(document.getElementById('chartStoriesReach'),{type:'bar',
+    data:{labels,datasets:[{label:'Story reach',data:mkData('reach'),backgroundColor:'rgba(150,80,50,0.82)',hoverBackgroundColor:'#965032',borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>fmt(ctx.parsed.y)+' reach')});
+
+  dc('sre');
+  const reactions=allMonths.map(([m])=>sd[m]?(sd[m].likes+(sd[m].replies||0)):0);
+  charts['sre']=new Chart(document.getElementById('chartStoriesReactions'),{type:'bar',
+    data:{labels,datasets:[{label:'Reactions',data:reactions,backgroundColor:'rgba(213,177,116,0.85)',hoverBackgroundColor:C.comments,borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>ctx.parsed.y+' reactions')});
+}
+
+// ─────────────── FACEBOOK TAB ───────────────────────────────────────────────
+function renderFacebook(){
+  const fd=getFbData();
+  const months=Object.keys(fd).sort();
+  const total=(k)=>months.reduce((s,m)=>s+(fd[m]?fd[m][k]:0),0);
+  const totalReach=total('reach'), total3s=total('views3');
+  const totalReactions=total('reactions'), totalComments=total('comments'), totalShares=total('shares');
+  const totalCount=total('count');
+
+  document.getElementById('kpi-fb').innerHTML=`
+    <div class="kpi hero">
+      <div class="val">${fmt(total3s)}</div>
+      <div class="lbl">3-second video views</div>
+      <div class="sub">${totalCount} videos published</div>
+    </div>
+    <div class="kpi"><div class="val">${fmt(totalReach)}</div><div class="lbl">Total reach</div><div class="sub">Unique people</div></div>
+    <div class="kpi"><div class="val">${fmt(totalReactions)}</div><div class="lbl">Reactions</div><div class="sub">${totalComments} comments · ${totalShares} shares</div></div>
+    <div class="kpi"><div class="val">${totalCount}</div><div class="lbl">Videos posted</div><div class="sub">Facebook page videos</div></div>`;
+
+  const allMonths=getMonthsInRange().filter(([m])=>m in FB);
+  const labels=allMonths.map(x=>x[1]);
+  const bestReach=months.sort((a,b)=>(fd[b]?.reach||0)-(fd[a]?.reach||0))[0];
+  months.sort();
+
+  document.getElementById('insights-fb').innerHTML=`
+    <div class="ins-head"><h3>What the numbers say</h3><span class="ins-sub">Facebook — Almaíso at Finca El Drago page</span></div>
+    <div class="insights-grid">
+      <div class="insight-item"><div class="ihead">Growing reach</div><div class="itext">Reach grew from <strong>${fmt(FB['01']?.reach||0)}</strong> in January to <strong>${fmt(FB['05']?.reach||0)}</strong> in May — a consistent upward trend.</div></div>
+      <div class="insight-item"><div class="ihead">Best month</div><div class="itext"><strong>${MONTH_FULL[bestReach]}</strong> led with <strong>${fmt(fd[bestReach]?.reach||0)}</strong> reach and <strong>${fmt(fd[bestReach]?.views3||0)}</strong> 3-sec video views.</div></div>
+      <div class="insight-item"><div class="ihead">Channel context</div><div class="itext">Facebook reach is naturally lower than Instagram. The numbers show an audience in <strong>early growth</strong> — consistent posting is the right strategy.</div></div>
+    </div>`;
+
+  const mkData=(k)=>allMonths.map(([m])=>fd[m]?fd[m][k]:0);
+
+  dc('fv');
+  charts['fv']=new Chart(document.getElementById('chartFbViews'),{type:'bar',
+    data:{labels,datasets:[{label:'3-sec views',data:mkData('views3'),backgroundColor:'rgba(99,110,66,0.82)',hoverBackgroundColor:C.reel,borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>fmt(ctx.parsed.y)+' 3-sec views')});
+
+  dc('fr');
+  charts['fr']=new Chart(document.getElementById('chartFbReach'),{type:'bar',
+    data:{labels,datasets:[{label:'Reach',data:mkData('reach'),backgroundColor:'rgba(193,128,63,0.75)',hoverBackgroundColor:C.carousel,borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>fmt(ctx.parsed.y)+' reach')});
+
+  dc('fe');
+  const reactions=allMonths.map(([m])=>fd[m]?fd[m].reactions:0);
+  const comments=allMonths.map(([m])=>fd[m]?fd[m].comments:0);
+  const shares=allMonths.map(([m])=>fd[m]?fd[m].shares:0);
+  charts['fe']=new Chart(document.getElementById('chartFbEngagement'),{type:'bar',
+    data:{labels,datasets:[
+      {label:'Reactions',data:reactions,backgroundColor:'rgba(150,80,50,0.82)',borderRadius:5,stack:'s'},
+      {label:'Comments',data:comments,backgroundColor:'rgba(213,177,116,0.85)',borderRadius:5,stack:'s'},
+      {label:'Shares',data:shares,backgroundColor:'rgba(99,110,66,0.75)',borderRadius:5,stack:'s'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,padding:12}},
+        tooltip:tipStyle(ctx=>ctx.parsed.y+' '+ctx.dataset.label.toLowerCase())},
+      scales:{y:gridScale({ticks:{padding:6,precision:0}}),x:{grid:{display:false},border:{display:false},ticks:{padding:6},stacked:true}}}
+  });
+
+  dc('fc');
+  charts['fc']=new Chart(document.getElementById('chartFbCount'),{type:'bar',
+    data:{labels,datasets:[{label:'Videos posted',data:mkData('count'),backgroundColor:'rgba(77,85,54,0.7)',hoverBackgroundColor:C.story,borderRadius:5,maxBarThickness:46}]},
+    options:barOpts(ctx=>ctx.parsed.y+' videos')});
+
+  // Top 5 posts table
+  renderFbTable(getFbPosts());
+}
+
+// ─────────────── MASTER RENDER ──────────────────────────────────────────────
+function render(){
+  // Destroy all existing charts
+  Object.keys(charts).forEach(k=>{charts[k]&&charts[k].destroy&&charts[k].destroy();});
+  charts={};
+
+  if(activeTab==='feed')     renderFeed();
+  if(activeTab==='stories')  renderStories();
+  if(activeTab==='facebook') renderFacebook();
+
+  // Update tab counts
+  document.getElementById('tab-count-feed').textContent=getFeedData().length+' posts';
+  const sm=getStoriesData(),sc=Object.values(sm).reduce((s,m)=>s+m.count,0);
+  document.getElementById('tab-count-stories').textContent=sc+' stories';
+  const fm=getFbData(),fc=Object.values(fm).reduce((s,m)=>s+m.count,0);
+  document.getElementById('tab-count-fb').textContent=fc+' videos';
+}
+
+// ─────────────── BADGE ──────────────────────────────────────────────────────
+function buildBadge(){
+  const size=60,r=size/2,textR=r-12;
+  const upper=`M ${r-textR} ${r} A ${textR} ${textR} 0 0 1 ${r+textR} ${r}`;
+  const lower=`M ${r+textR} ${r} A ${textR} ${textR} 0 0 1 ${r-textR} ${r}`;
+  const label='ALMAISO · SOCIAL',half=Math.ceil(label.length/2);
+  document.getElementById('badge-slot').innerHTML=
+    `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;flex:none">
+      <circle cx="${r}" cy="${r}" r="${r}" fill="#965032"/>
+      <circle cx="${r}" cy="${r}" r="${r-4}" fill="none" stroke="#FBF6EF" stroke-width="1" opacity="0.45"/>
+      <defs><path id="arc-u" d="${upper}"/><path id="arc-l" d="${lower}"/></defs>
+      <text fill="#FBF6EF" font-family="Cabinet Grotesk" font-size="${size*0.077}" letter-spacing="${size*0.011}" font-weight="500"><textPath href="#arc-u" startOffset="50%" text-anchor="middle">${label.slice(0,half).trim()}</textPath></text>
+      <text fill="#FBF6EF" font-family="Cabinet Grotesk" font-size="${size*0.077}" letter-spacing="${size*0.011}" font-weight="500"><textPath href="#arc-l" startOffset="50%" text-anchor="middle">${label.slice(half).trim()}</textPath></text>
+      <text x="${r}" y="${r+size*0.115}" text-anchor="middle" font-family="Cabinet Grotesk" font-size="${size*0.42}" font-weight="500" fill="#FBF6EF">A</text>
+    </svg>`;
+}
+
+buildBadge();
+initFilters();
+initTabs();
+render();
+
+// ─────────────── ADMIN ───────────────────────────────────────────────────────
+const ADMIN_HASH = btoa(unescape(encodeURIComponent('almaiso2026')));
+const LS = { posts:'almaiso_posts_v1', stories:'almaiso_stories_v1', fb:'almaiso_fb_v1', fbPosts:'almaiso_fb_posts_v1' };
+let pendingFiles = {};
+let adminLoggedIn = false;
+
+function openAdmin(){
+  document.getElementById('adminOverlay').classList.add('open');
+  checkSavedBadge();
+  if(adminLoggedIn){ document.getElementById('adminLogin').style.display='none'; document.getElementById('adminPanel').classList.add('visible'); }
+}
+function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('open'); }
+
+function adminDoLogin(){
+  const pw = document.getElementById('adminPass').value;
+  if(btoa(unescape(encodeURIComponent(pw))) === ADMIN_HASH){
+    adminLoggedIn = true;
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('visible');
+    document.getElementById('adminErr').textContent = '';
+  } else {
+    document.getElementById('adminErr').textContent = 'Incorrect password.';
+  }
+}
+
+function fileSelected(type, input){
+  if(!input.files[0]) return;
+  pendingFiles[type] = input.files[0];
+  const el = document.getElementById('status-'+type);
+  const row = document.getElementById('row-'+type);
+  el.textContent = '✓ ' + input.files[0].name;
+  row.classList.add('has-file');
+  document.getElementById('btnApply').disabled = Object.keys(pendingFiles).length === 0;
+}
+
+function checkSavedBadge(){
+  const hasSaved = Object.values(LS).some(k => localStorage.getItem(k));
+  document.getElementById('savedBadge').style.display = hasSaved ? '' : 'none';
+}
+
+// ── CSV parser ──
+function parseCSVLine(line){
+  const res=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){ if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ; }
+    else if(c===','&&!inQ){ res.push(cur); cur=''; }
+    else cur+=c;
+  }
+  res.push(cur); return res;
+}
+function parseCSV(text){
+  const lines=text.split('\n').map(l=>l.replace(/\r$/,''));
+  const headers=parseCSVLine(lines[0]).map(h=>h.replace(/^\uFEFF/,'').trim().replace(/^"/,'').replace(/"$/,''));
+  return lines.slice(1).map(line=>{
+    const vals=parseCSVLine(line);
+    const obj={};
+    headers.forEach((h,i)=>obj[h]=(vals[i]||'').trim().replace(/^"/,'').replace(/"$/,''));
+    return obj;
+  }).filter(r=>Object.values(r).some(v=>v));
+}
+
+function parsePostsCSV(text){
+  const rows=parseCSV(text);
+  return rows.map(p=>{
+    const n=x=>parseInt(x)||0;
+    const views=n(p['Views']),likes=n(p['Likes']),saves=n(p['Saves']),shares=n(p['Shares']),comments=n(p['Comments']),reach=n(p['Reach']),follows=n(p['Follows']);
+    const eng=likes+saves+shares+comments;
+    return { username:p['Account username'],type:p['Post type'],date:(p['Publish time']||'').substring(0,10),
+      views,likes,saves,shares,comments,reach,follows,engagement:eng,
+      eng_rate:reach>0?Math.round(eng/reach*1000)/10:0,
+      desc:(p['Description']||'').replace(/\n/g,' ').substring(0,100) };
+  }).filter(p=>p.date&&p.type&&(p.type.includes('reel')||p.type.includes('carousel')));
+}
+
+function parseStoriesCSV(text){
+  const rows=parseCSV(text);
+  const byM={};
+  rows.forEach(p=>{
+    const date=(p['Publish time']||'').substring(0,10);
+    if(!date) return;
+    const m=date.substring(0,2);
+    if(!byM[m]) byM[m]={count:0,views:0,reach:0,likes:0,replies:0,profile_visits:0,follows:0};
+    const n=x=>parseInt(x)||0;
+    byM[m].count++;byM[m].views+=n(p['Views']);byM[m].reach+=n(p['Reach']);
+    byM[m].likes+=n(p['Likes']);byM[m].replies+=n(p['Replies']);
+    byM[m].profile_visits+=n(p['Profile visits']);byM[m].follows+=n(p['Follows']);
+  });
+  return byM;
+}
+
+function parseFBCSV(text){
+  const rows=parseCSV(text);
+  const byM={};const posts=[];
+  rows.forEach(p=>{
+    const date=(p['Publish time']||'').substring(0,10);
+    if(!date) return;
+    const m=date.substring(0,2);
+    const n=x=>parseInt(x)||0;
+    const reach=n(p['Reach']),v3=n(p['3-second video views']),reactions=n(p['Reactions']),comments=n(p['Comments']),shares=n(p['Shares']);
+    if(!byM[m]) byM[m]={count:0,reach:0,views3:0,reactions:0,comments:0,shares:0};
+    byM[m].count++;byM[m].reach+=reach;byM[m].views3+=v3;byM[m].reactions+=reactions;byM[m].comments+=comments;byM[m].shares+=shares;
+    posts.push({date,reach,views3:v3,reactions,comments,shares});
+  });
+  return {byM,posts};
+}
+
+function readFile(file){ return new Promise(res=>{ const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsText(file,'UTF-8'); }); }
+
+async function applyUploads(){
+  const btn=document.getElementById('btnApply');
+  const msg=document.getElementById('applyMsg');
+  btn.disabled=true; msg.textContent='Processing…';
+  try {
+    if(pendingFiles.posts){
+      const text=await readFile(pendingFiles.posts);
+      const parsed=parsePostsCSV(text);
+      if(parsed.length===0) throw new Error('Posts CSV: no valid rows found. Check the file format.');
+      localStorage.setItem(LS.posts, JSON.stringify(parsed));
+    }
+    if(pendingFiles.stories){
+      const text=await readFile(pendingFiles.stories);
+      const parsed=parseStoriesCSV(text);
+      if(Object.keys(parsed).length===0) throw new Error('Stories CSV: no valid rows found.');
+      localStorage.setItem(LS.stories, JSON.stringify(parsed));
+    }
+    if(pendingFiles.fb){
+      const text=await readFile(pendingFiles.fb);
+      const parsed=parseFBCSV(text);
+      if(Object.keys(parsed.byM).length===0) throw new Error('Facebook CSV: no valid rows found.');
+      localStorage.setItem(LS.fb, JSON.stringify(parsed.byM));
+      localStorage.setItem(LS.fbPosts, JSON.stringify(parsed.posts));
+    }
+    loadSavedData();
+    render();
+    msg.textContent = '✓ Dashboard updated successfully!';
+    msg.style.color = 'var(--jungle-600)';
+    checkSavedBadge();
+    pendingFiles={};
+    ['posts','stories','fb'].forEach(t=>{ document.getElementById('status-'+t).textContent='No file selected'; document.getElementById('row-'+t).classList.remove('has-file'); });
+  } catch(e) {
+    msg.textContent = '✗ ' + e.message;
+    msg.style.color = '#b03030';
+  }
+  btn.disabled = Object.keys(pendingFiles).length===0;
+}
+
+function clearSavedData(){
+  Object.values(LS).forEach(k=>localStorage.removeItem(k));
+  loadSavedData();
+  render();
+  document.getElementById('applyMsg').textContent = 'Saved data cleared. Using built-in data.';
+  document.getElementById('applyMsg').style.color = 'var(--ink-soft)';
+  checkSavedBadge();
+}
+
+function loadSavedData(){
+  try {
+    const p=localStorage.getItem(LS.posts);     if(p) { FEED_RAW.length=0; JSON.parse(p).forEach(x=>FEED_RAW.push(x)); }
+    const s=localStorage.getItem(LS.stories);   if(s) { Object.keys(STORIES).forEach(k=>delete STORIES[k]); Object.assign(STORIES,JSON.parse(s)); }
+    const f=localStorage.getItem(LS.fb);        if(f) { Object.keys(FB).forEach(k=>delete FB[k]); Object.assign(FB,JSON.parse(f)); }
+    const fp=localStorage.getItem(LS.fbPosts);  if(fp){ FB_POSTS.length=0; JSON.parse(fp).forEach(x=>FB_POSTS.push(x)); }
+  } catch(e){ console.warn('Error loading saved data:',e); }
+}
+
+// Load on startup
+loadSavedData();
+
+</script>
+
+<!-- ── ADMIN TRIGGER ── -->
+<button class="admin-trigger" onclick="openAdmin()" title="Admin">⚙</button>
+
+<!-- ── ADMIN MODAL ── -->
+<div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
+  <div class="admin-modal">
+    <button class="admin-close" onclick="closeAdmin()">✕</button>
+    <h2>Dashboard Admin <span class="admin-saved-badge" id="savedBadge" style="display:none">Data saved</span></h2>
+    <div class="admin-sub">Upload new CSV exports from Meta Business Suite to update the dashboard.</div>
+
+    <!-- LOGIN -->
+    <div class="admin-login" id="adminLogin">
+      <label for="adminPass">Password</label>
+      <input type="password" id="adminPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminDoLogin()">
+      <div class="err" id="adminErr"></div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn-apply" onclick="adminDoLogin()">Login</button>
+      </div>
+    </div>
+
+    <!-- UPLOAD PANEL -->
+    <div class="admin-panel" id="adminPanel">
+      <div class="upload-grid">
+        <div class="upload-row" id="row-posts" onclick="document.getElementById('file-posts').click()">
+          <div class="upload-row-info">
+            <div class="upload-label">📸 Instagram Posts</div>
+            <div class="upload-hint">Reels & carousels from Meta Business Suite</div>
+          </div>
+          <div class="upload-row-status" id="status-posts">No file selected</div>
+          <input type="file" id="file-posts" accept=".csv" onchange="fileSelected('posts',this)">
+        </div>
+        <div class="upload-row" id="row-stories" onclick="document.getElementById('file-stories').click()">
+          <div class="upload-row-info">
+            <div class="upload-label">🔄 Instagram Stories</div>
+            <div class="upload-hint">Story frames from Meta Business Suite</div>
+          </div>
+          <div class="upload-row-status" id="status-stories">No file selected</div>
+          <input type="file" id="file-stories" accept=".csv" onchange="fileSelected('stories',this)">
+        </div>
+        <div class="upload-row" id="row-fb" onclick="document.getElementById('file-fb').click()">
+          <div class="upload-row-info">
+            <div class="upload-label">📘 Facebook Videos</div>
+            <div class="upload-hint">Video performance from Meta Business Suite</div>
+          </div>
+          <div class="upload-row-status" id="status-fb">No file selected</div>
+          <input type="file" id="file-fb" accept=".csv" onchange="fileSelected('fb',this)">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-apply" id="btnApply" onclick="applyUploads()" disabled>Apply & Save</button>
+        <button class="btn-clear" onclick="clearSavedData()">Clear saved data</button>
+      </div>
+      <div class="apply-msg" id="applyMsg"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
