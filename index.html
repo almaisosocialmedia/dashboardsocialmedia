@@ -284,13 +284,14 @@
   <div class="fgroup">
     <span class="flabel">Quick select</span>
     <div class="filter-quick">
-      <button class="chip quick-chip active" data-from="2026-01-01" data-to="2026-06-30">All</button>
+      <button class="chip quick-chip active" data-from="2026-01-01" data-to="2026-07-31">All</button>
       <button class="chip quick-chip" data-from="2026-01-01" data-to="2026-01-31">Jan</button>
       <button class="chip quick-chip" data-from="2026-02-01" data-to="2026-02-28">Feb</button>
       <button class="chip quick-chip" data-from="2026-03-01" data-to="2026-03-31">Mar</button>
       <button class="chip quick-chip" data-from="2026-04-01" data-to="2026-04-30">Apr</button>
       <button class="chip quick-chip" data-from="2026-05-01" data-to="2026-05-31">May</button>
       <button class="chip quick-chip" data-from="2026-06-01" data-to="2026-06-30">Jun</button>
+      <button class="chip quick-chip" data-from="2026-07-01" data-to="2026-07-31">Jul</button>
     </div>
   </div>
 </div>
@@ -401,7 +402,7 @@
 
 <div class="footnote">
   Instagram feed: engagement rate = (likes + saves + shares + comments) ÷ reach. Views = total impressions (feed &amp; stories).
-  Facebook: 3-second video views as reported by Meta. All data covers Jan–Jun 2026 · @almaiso.tenerife.
+  Facebook: 3-second video views as reported by Meta. All data covers Jan–Jul 2026 · @almaiso.tenerife.
 </div>
 
 <script>
@@ -462,7 +463,8 @@ const STORIES = {
   '03':{count:26, views:3276,  reach:2447, likes:66,  replies:8},
   '04':{count:62, views:10556, reach:7898, likes:147, replies:11},
   '05':{count:44, views:8251,  reach:6075, likes:187, replies:15},
-  '06':{count:48, views:6843,  reach:5496, likes:126, replies:7}
+  '06':{count:48, views:6843,  reach:5496, likes:126, replies:7},
+  '07':{count:28, views:4895,  reach:3724, likes:110, replies:6}
 };
 
 // Facebook — aggregated by month from CSV export (Almaiso at Finca El Drago page)
@@ -472,7 +474,8 @@ const FB = {
   '03':{count:11, reach:738,  views3:358, reactions:15, comments:0, shares:0},
   '04':{count:17, reach:934,  views3:551, reactions:16, comments:2, shares:0},
   '05':{count:11, reach:1502, views3:579, reactions:14, comments:2, shares:3},
-  '06':{count:3,  reach:0,    views3:321, reactions:5,  comments:0, shares:0}
+  '06':{count:3,  reach:0,    views3:321, reactions:5,  comments:0, shares:0},
+  '07':{count:10, reach:907,  views3:376, reactions:19, comments:0, shares:0}
 };
 
 // Facebook — individual video posts (only posts with meaningful reach, from CSV)
@@ -496,11 +499,15 @@ const FB_POSTS = [
   {date:"05/30/2026", reach:226, views3:57,  reactions:2,  comments:0, shares:1},
   {date:"06/05/2026", reach:0,   views3:99,  reactions:1,  comments:0, shares:0},
   {date:"06/10/2026", reach:0,   views3:113, reactions:4,  comments:0, shares:0},
-  {date:"06/12/2026", reach:0,   views3:109, reactions:0,  comments:0, shares:0}
+  {date:"06/12/2026", reach:0,   views3:109, reactions:0,  comments:0, shares:0},
+  {date:"07/03/2026", reach:301, views3:151, reactions:3,  comments:0, shares:0},
+  {date:"07/12/2026", reach:151, views3:100, reactions:0,  comments:0, shares:0},
+  {date:"07/19/2026", reach:173, views3:103, reactions:1,  comments:0, shares:0},
+  {date:"07/28/2026", reach:29,  views3:22,  reactions:0,  comments:0, shares:0}
 ];
 
-const MONTHS     = [['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun']];
-const MONTH_FULL = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June'};
+const MONTHS     = [['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun'],['07','Jul']];
+const MONTH_FULL = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July'};
 
 const C = {
   reel:'#636E42', carousel:'#C1803F', ink:'#454B32', inkSoft:'#6D6A52',
