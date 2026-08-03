@@ -93,6 +93,11 @@
   .kpi.hero .lbl,.kpi.hero-blue .lbl{color:color-mix(in oklab,var(--sienna-100) 72%,var(--sienna-300))}
   .kpi .sub{font-size:11px;color:var(--ink-soft);margin-top:3px}
   .kpi.hero .sub,.kpi.hero-blue .sub{color:var(--sienna-200)}
+  .delta{font-size:11px;font-weight:600;padding:2px 6px;border-radius:20px;margin-left:5px;vertical-align:middle;white-space:nowrap}
+  .delta.up{color:#2d6a4f;background:rgba(45,106,79,0.13)}
+  .delta.down{color:#9b2226;background:rgba(155,34,38,0.12)}
+  .kpi.hero .delta.up{color:#b7e4c7;background:rgba(183,228,199,0.18)}
+  .kpi.hero .delta.down{color:#ffb3b3;background:rgba(255,179,179,0.18)}
 
   /* INSIGHTS */
   .insights{background:var(--jungle-800);color:var(--sienna-100);border-radius:var(--r-card);padding:26px 30px;margin-bottom:20px}
@@ -531,7 +536,7 @@ Chart.defaults.color       = C.inkSoft;
 
 // ─────────────── STATE ──────────────────────────────────────────────────────
 let dateFrom = new Date('2026-01-01');
-let dateTo   = new Date('2026-06-30');
+let dateTo   = new Date('2026-07-31');
 let activeTab = 'feed';
 let charts = {};
 const tableState = { key:'reach', dir:-1 };
@@ -635,6 +640,23 @@ function initFilters(){
   });
 }
 
+// ─────────────── MOM COMPARISON HELPERS ────────────────────────────────────
+function selectedSingleMonth(){
+  if(!dateFrom||!dateTo)return null;
+  const fm=String(dateFrom.getMonth()+1).padStart(2,'0');
+  const tm=String(dateTo.getMonth()+1).padStart(2,'0');
+  if(dateFrom.getFullYear()===dateTo.getFullYear()&&fm===tm)return fm;
+  return null;
+}
+function prevMo(mm){const n=parseInt(mm);return n<=1?null:String(n-1).padStart(2,'0');}
+function dHtml(curr,prev){
+  if(prev==null||prev===undefined)return '';
+  if(prev===0)return curr>0?'<span class="delta up">↑ novo</span>':'';
+  const p=Math.round((curr-prev)/prev*100);
+  if(p===0)return '';
+  return `<span class="delta ${p>0?'up':'down'}">${p>0?'↑':'↓'} ${p>0?'+':''}${p}%</span>`;
+}
+
 // ─────────────── FEED TAB ───────────────────────────────────────────────────
 function renderFeed(){
   const data = getFeedData();
@@ -646,17 +668,22 @@ function renderFeed(){
   const avgReach  = wr.length   ? fmt(Math.round(wr.reduce((s,d)=>s+d.reach,0)/wr.length)) : '—';
   const months    = [...new Set(data.map(d=>d.date.substring(0,2)))].length || 1;
   const avgFollowsPerMonth = fmt(Math.round(sum('follows')/months));
+  // MoM comparison
+  const sm=selectedSingleMonth(), pm=sm?prevMo(sm):null;
+  const prev=pm?FEED_RAW.filter(d=>d.date.substring(0,2)===pm):null;
+  const psum=k=>prev?prev.reduce((s,d)=>s+d[k],0):null;
+  const par=prev&&prev.filter(d=>d.reach>0).length?(prev.filter(d=>d.reach>0).reduce((s,d)=>s+d.eng_rate,0)/prev.filter(d=>d.reach>0).length).toFixed(1):null;
   document.getElementById('kpi-feed').innerHTML=`
     <div class="kpi hero">
-      <div class="val">${fmt(sum('views'))}</div>
+      <div class="val">${fmt(sum('views'))}${dHtml(sum('views'),psum('views'))}</div>
       <div class="lbl">Total views</div>
       <div class="sub">${data.length} post${data.length!==1?'s':''} published</div>
       <div class="sub" style="margin-top:4px">avg. <strong>${avgViews}</strong> views/post</div>
     </div>
-    <div class="kpi"><div class="val">${fmt(sum('reach'))}</div><div class="lbl">Total reach</div><div class="sub">avg. <strong>${avgReach}</strong> reach/post</div></div>
-    <div class="kpi"><div class="val">${fmt(sum('follows'))}</div><div class="lbl">New followers</div><div class="sub">avg. <strong>${avgFollowsPerMonth}</strong>/month</div></div>
-    <div class="kpi"><div class="val">${ar}${ar!=='—'?'%':''}</div><div class="lbl">Avg. eng. rate</div><div class="sub">Posts with reach data</div></div>
-    <div class="kpi"><div class="val">${fmt(sum('likes'))}</div><div class="lbl">Total likes</div><div class="sub">${fmt(sum('saves'))} saves · ${fmt(sum('shares'))} shares</div></div>`;
+    <div class="kpi"><div class="val">${fmt(sum('reach'))}${dHtml(sum('reach'),psum('reach'))}</div><div class="lbl">Total reach</div><div class="sub">avg. <strong>${avgReach}</strong> reach/post</div></div>
+    <div class="kpi"><div class="val">${fmt(sum('follows'))}${dHtml(sum('follows'),psum('follows'))}</div><div class="lbl">New followers</div><div class="sub">avg. <strong>${avgFollowsPerMonth}</strong>/month</div></div>
+    <div class="kpi"><div class="val">${ar}${ar!=='—'?'%':''}${ar!=='—'&&par?dHtml(parseFloat(ar),parseFloat(par)):''}</div><div class="lbl">Avg. eng. rate</div><div class="sub">Posts with reach data</div></div>
+    <div class="kpi"><div class="val">${fmt(sum('likes'))}${dHtml(sum('likes'),psum('likes'))}</div><div class="lbl">Total likes</div><div class="sub">${fmt(sum('saves'))} saves · ${fmt(sum('shares'))} shares</div></div>`;
 
   // Insights
   const reels=data.filter(d=>d.type==='IG reel'), cars=data.filter(d=>d.type==='IG carousel');
@@ -889,17 +916,20 @@ function renderStories(){
   const totalViews=total('views'), totalReach=total('reach'), totalLikes=total('likes');
   const totalReplies=total('replies'), totalCount=total('count');
   const avgViews=totalCount?Math.round(totalViews/totalCount):0;
+  // MoM comparison
+  const sm=selectedSingleMonth(), pm=sm?prevMo(sm):null;
+  const ps=pm&&STORIES[pm]?STORIES[pm]:null;
 
   // KPIs
   document.getElementById('kpi-stories').innerHTML=`
     <div class="kpi hero">
-      <div class="val">${fmt(totalViews)}</div>
+      <div class="val">${fmt(totalViews)}${ps?dHtml(totalViews,ps.views):''}</div>
       <div class="lbl">Total story views</div>
       <div class="sub">${totalCount} stories published</div>
     </div>
-    <div class="kpi"><div class="val">${fmt(totalReach)}</div><div class="lbl">Total reach</div><div class="sub">Unique accounts</div></div>
-    <div class="kpi"><div class="val">${fmt(totalLikes)}</div><div class="lbl">Story likes</div><div class="sub">${totalReplies} replies</div></div>
-    <div class="kpi"><div class="val">${fmt(avgViews)}</div><div class="lbl">Avg. views/story</div><div class="sub">Per story frame</div></div>`;
+    <div class="kpi"><div class="val">${fmt(totalReach)}${ps?dHtml(totalReach,ps.reach):''}</div><div class="lbl">Total reach</div><div class="sub">Unique accounts</div></div>
+    <div class="kpi"><div class="val">${fmt(totalLikes)}${ps?dHtml(totalLikes,ps.likes):''}</div><div class="lbl">Story likes</div><div class="sub">${totalReplies} replies</div></div>
+    <div class="kpi"><div class="val">${fmt(avgViews)}${ps?dHtml(avgViews,Math.round(ps.views/ps.count)):''}</div><div class="lbl">Avg. views/story</div><div class="sub">Per story frame</div></div>`;
 
   // Insights
   const bestViewsMonth=months.sort((a,b)=>(sd[b]?.views||0)-(sd[a]?.views||0))[0];
@@ -958,16 +988,19 @@ function renderFacebook(){
   const totalReach=total('reach'), total3s=total('views3');
   const totalReactions=total('reactions'), totalComments=total('comments'), totalShares=total('shares');
   const totalCount=total('count');
+  // MoM comparison
+  const sm=selectedSingleMonth(), pm=sm?prevMo(sm):null;
+  const pf=pm&&FB[pm]?FB[pm]:null;
 
   document.getElementById('kpi-fb').innerHTML=`
     <div class="kpi hero">
-      <div class="val">${fmt(total3s)}</div>
+      <div class="val">${fmt(total3s)}${pf?dHtml(total3s,pf.views3):''}</div>
       <div class="lbl">3-second video views</div>
       <div class="sub">${totalCount} videos published</div>
     </div>
-    <div class="kpi"><div class="val">${fmt(totalReach)}</div><div class="lbl">Total reach</div><div class="sub">Unique people</div></div>
-    <div class="kpi"><div class="val">${fmt(totalReactions)}</div><div class="lbl">Reactions</div><div class="sub">${totalComments} comments · ${totalShares} shares</div></div>
-    <div class="kpi"><div class="val">${totalCount}</div><div class="lbl">Videos posted</div><div class="sub">Facebook page videos</div></div>`;
+    <div class="kpi"><div class="val">${fmt(totalReach)}${pf?dHtml(totalReach,pf.reach):''}</div><div class="lbl">Total reach</div><div class="sub">Unique people</div></div>
+    <div class="kpi"><div class="val">${fmt(totalReactions)}${pf?dHtml(totalReactions,pf.reactions):''}</div><div class="lbl">Reactions</div><div class="sub">${totalComments} comments · ${totalShares} shares</div></div>
+    <div class="kpi"><div class="val">${totalCount}${pf?dHtml(totalCount,pf.count):''}</div><div class="lbl">Videos posted</div><div class="sub">Facebook page videos</div></div>`;
 
   const allMonths=getMonthsInRange().filter(([m])=>m in FB);
   const labels=allMonths.map(x=>x[1]);
