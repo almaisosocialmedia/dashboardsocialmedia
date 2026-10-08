@@ -289,7 +289,7 @@
   <div class="fgroup">
     <span class="flabel">Quick select</span>
     <div class="filter-quick">
-      <button class="chip quick-chip active" data-from="2026-01-01" data-to="2026-08-31">All</button>
+      <button class="chip quick-chip active" data-from="2026-01-01" data-to="2026-09-30">All</button>
       <button class="chip quick-chip" data-from="2026-01-01" data-to="2026-01-31">Jan</button>
       <button class="chip quick-chip" data-from="2026-02-01" data-to="2026-02-28">Feb</button>
       <button class="chip quick-chip" data-from="2026-03-01" data-to="2026-03-31">Mar</button>
@@ -298,6 +298,7 @@
       <button class="chip quick-chip" data-from="2026-06-01" data-to="2026-06-30">Jun</button>
       <button class="chip quick-chip" data-from="2026-07-01" data-to="2026-07-31">Jul</button>
       <button class="chip quick-chip" data-from="2026-08-01" data-to="2026-08-31">Aug</button>
+      <button class="chip quick-chip" data-from="2026-09-01" data-to="2026-09-30">Sep</button>
     </div>
   </div>
 </div>
@@ -408,7 +409,7 @@
 
 <div class="footnote">
   Instagram feed: engagement rate = (likes + saves + shares + comments) ÷ reach. Views = total impressions (feed &amp; stories).
-  Facebook: 3-second video views as reported by Meta. All data covers Jan–Aug 2026 · @almaiso.tenerife.
+  Facebook: 3-second video views as reported by Meta. All data covers Jan–Sep 2026 · @almaiso.tenerife.
 </div>
 
 <script>
@@ -416,6 +417,13 @@
 
 // Instagram Feed posts (@almaiso.tenerife only)
 const FEED_RAW = [
+  {type:"IG carousel",date:"09/29/2026",views:975,  likes:34,  saves:2, shares:2, comments:0,  reach:368,  follows:0, eng_rate:10.33, desc:"The tiles under our feet. Flowers growing around a window. Details that slowly make a place feel like home."},
+  {type:"IG reel",    date:"09/27/2026",views:1042, likes:46,  saves:2, shares:1, comments:0,  reach:564,  follows:2, eng_rate:8.69,  desc:"Deadlines, plans, expectations. When we welcome people to Almaíso, we know how important it is to slow down."},
+  {type:"IG carousel",date:"09/24/2026",views:1249, likes:45,  saves:3, shares:1, comments:5,  reach:434,  follows:0, eng_rate:12.44, desc:"Walking into Villa Lena feels a little like stepping out of our own time."},
+  {type:"IG carousel",date:"09/21/2026",views:2473, likes:49,  saves:1, shares:13,comments:7,  reach:980,  follows:1, eng_rate:7.14,  desc:"Full Moon in Aries: An Evening of Ancestral Remembrance 🌕"},
+  {type:"IG carousel",date:"09/20/2026",views:2138, likes:30,  saves:2, shares:13,comments:2,  reach:879,  follows:2, eng_rate:5.35,  desc:"Some gatherings leave a different rhythm behind. Co~Nectar back to Almaíso for its third chapter."},
+  {type:"IG reel",    date:"09/10/2026",views:1402, likes:71,  saves:1, shares:0, comments:8,  reach:737,  follows:1, eng_rate:10.85, desc:"Last week, we gathered around the table with the team for a small pause."},
+  {type:"IG carousel",date:"09/02/2026",views:1250, likes:40,  saves:7, shares:2, comments:2,  reach:506,  follows:0, eng_rate:10.08, desc:"A retreat does not always have to stay within the retreat space. Sometimes, the island becomes part."},
   {type:"IG carousel",date:"08/27/2026",views:3546, likes:76,  saves:2, shares:9, comments:5,  reach:1634, follows:4, eng_rate:5.63,  desc:"Learning from living systems 🌱 Three days learning from the land with Juã Pereira, regenerative agriculture."},
   {type:"IG reel",   date:"08/25/2026",views:528,  likes:27,  saves:0, shares:0, comments:1,  reach:319,  follows:0, eng_rate:8.78,  desc:"We're allowed to imagine a future that feels good. It looks like hands in the soil."},
   {type:"IG carousel",date:"08/21/2026",views:2280, likes:27,  saves:1, shares:11,comments:1,  reach:806,  follows:0, eng_rate:4.96,  desc:"On 3 & 4 October, our land will take on a different rhythm. Co~Nectar Conscious Festival."},
@@ -483,7 +491,14 @@ const FEED_RAW = [
 // Instagram Stories — aggregated by month from CSV export
 const FOLLOWS = {
   '01':120, '02':105, '03':88, '04':103, '05':98, '06':132, '07':105, '08':135
+  // '09': pending account-level export (Sep data not yet in Follows.csv)
 };
+// Account-level metrics from Meta Business Suite (daily exports summed by month)
+const ACCT_VIEWS        = {'01':30153,'02':23489,'03':22499,'04':24748,'05':25164,'06':43823,'07':25219,'08':36962,'09':48563};
+const ACCT_REACH        = {'01':10329,'02':7766, '03':6867, '04':7263, '05':7776, '06':9445, '07':8109, '08':8852, '09':9167};
+const ACCT_INTERACTIONS = {'01':768,  '02':671,  '03':765,  '04':909,  '05':949,  '06':1043, '07':897,  '08':1083, '09':1329};
+const ACCT_VISITS       = {'01':1021, '02':712,  '03':666,  '04':722,  '05':742,  '06':718,  '07':651,  '08':767,  '09':819};
+const ACCT_LINK_CLICKS  = {'01':36,   '02':10,   '03':14,   '04':39,   '05':14,   '06':12,   '07':3,    '08':43,   '09':5};
 const STORIES = {
   '01':{count:56, views:11093, reach:8258, likes:140, replies:10},
   '02':{count:33, views:6606,  reach:4989, likes:85,  replies:6},
@@ -492,7 +507,8 @@ const STORIES = {
   '05':{count:44, views:8251,  reach:6075, likes:187, replies:15},
   '06':{count:48, views:6843,  reach:5496, likes:126, replies:7},
   '07':{count:28, views:4895,  reach:3724, likes:110, replies:6},
-  '08':{count:57, views:8273,  reach:6126, likes:183, replies:10}
+  '08':{count:57, views:8273,  reach:6126, likes:183, replies:10},
+  '09':{count:48, views:9058,  reach:6725, likes:228, replies:5}
 };
 
 // Facebook — aggregated by month from CSV export (Almaiso at Finca El Drago page)
@@ -504,7 +520,8 @@ const FB = {
   '05':{count:11, reach:1502, views3:579, reactions:14, comments:2, shares:3},
   '06':{count:3,  reach:0,    views3:321, reactions:5,  comments:0, shares:0},
   '07':{count:10, reach:907,  views3:376, reactions:19, comments:0, shares:0},
-  '08':{count:8,  reach:549,  views3:0,   reactions:8,  comments:0, shares:1}
+  '08':{count:8,  reach:549,  views3:0,   reactions:8,  comments:0, shares:1},
+  '09':{count:10, reach:754,  views3:0,   reactions:11, comments:0, shares:0}
 };
 
 // Facebook — individual video posts (only posts with meaningful reach, from CSV)
@@ -534,11 +551,21 @@ const FB_POSTS = [
   {date:"07/19/2026", reach:173, views3:103, reactions:1,  comments:0, shares:0},
   {date:"07/28/2026", reach:29,  views3:22,  reactions:0,  comments:0, shares:0},
   {date:"08/07/2026", reach:46,  views3:0,   reactions:2,  comments:0, shares:0},
-  {date:"08/25/2026", reach:249, views3:0,   reactions:1,  comments:0, shares:0}
+  {date:"08/25/2026", reach:249, views3:0,   reactions:1,  comments:0, shares:0},
+  {date:"09/02/2026", reach:42,  views3:0,   reactions:0,  comments:0, shares:0},
+  {date:"09/02/2026", reach:46,  views3:0,   reactions:0,  comments:0, shares:0},
+  {date:"09/10/2026", reach:169, views3:0,   reactions:3,  comments:0, shares:0},
+  {date:"09/20/2026", reach:43,  views3:0,   reactions:0,  comments:0, shares:0},
+  {date:"09/21/2026", reach:41,  views3:0,   reactions:0,  comments:0, shares:0},
+  {date:"09/21/2026", reach:34,  views3:0,   reactions:0,  comments:0, shares:0},
+  {date:"09/21/2026", reach:32,  views3:0,   reactions:0,  comments:0, shares:0},
+  {date:"09/24/2026", reach:88,  views3:0,   reactions:4,  comments:0, shares:0},
+  {date:"09/27/2026", reach:202, views3:0,   reactions:3,  comments:0, shares:0},
+  {date:"09/29/2026", reach:57,  views3:0,   reactions:1,  comments:0, shares:0}
 ];
 
-const MONTHS     = [['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun'],['07','Jul'],['08','Aug']];
-const MONTH_FULL = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August'};
+const MONTHS     = [['01','Jan'],['02','Feb'],['03','Mar'],['04','Apr'],['05','May'],['06','Jun'],['07','Jul'],['08','Aug'],['09','Sep']];
+const MONTH_FULL = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September'};
 
 const C = {
   reel:'#636E42', carousel:'#C1803F', ink:'#454B32', inkSoft:'#6D6A52',
@@ -553,7 +580,7 @@ Chart.defaults.color       = C.inkSoft;
 
 // ─────────────── STATE ──────────────────────────────────────────────────────
 let dateFrom = new Date('2026-01-01');
-let dateTo   = new Date('2026-08-31');
+let dateTo   = new Date('2026-09-30');
 let activeTab = 'feed';
 let charts = {};
 const tableState = { key:'reach', dir:-1 };
@@ -677,15 +704,13 @@ function dHtml(curr,prev){
 // ─────────────── FEED TAB ───────────────────────────────────────────────────
 function renderFeed(){
   const data = getFeedData();
-  // KPIs
+  // KPIs — account-level metrics from Meta Business Suite
   const wr  = data.filter(d=>d.reach>0);
   const ar  = wr.length?(wr.reduce((s,d)=>s+d.eng_rate,0)/wr.length).toFixed(1):'—';
   const sum = k=>data.reduce((s,d)=>s+d[k],0);
-  const avgViews  = data.length ? fmt(Math.round(sum('views')/data.length)) : '—';
-  const avgReach  = wr.length   ? fmt(Math.round(wr.reduce((s,d)=>s+d.reach,0)/wr.length)) : '—';
-  const months    = [...new Set(data.map(d=>d.date.substring(0,2)))].length || 1;
-  // Use account-level follows data (Instagram Insights) instead of per-post attribution
-  const followsMos = getMonthsInRange().map(([m])=>m).filter(m=>m in FOLLOWS);
+  const moList = getMonthsInRange().map(([m])=>m);
+  const acctSum = obj=>moList.reduce((s,m)=>s+(obj[m]||0),0);
+  const followsMos = moList.filter(m=>m in FOLLOWS);
   const totalFollows = followsMos.reduce((s,m)=>s+(FOLLOWS[m]||0),0);
   const avgFollowsPerMonth = followsMos.length ? fmt(Math.round(totalFollows/followsMos.length)) : '—';
   // MoM comparison
@@ -693,64 +718,70 @@ function renderFeed(){
   const prev=pm?FEED_RAW.filter(d=>d.date.substring(0,2)===pm):null;
   const psum=k=>prev?prev.reduce((s,d)=>s+d[k],0):null;
   const par=prev&&prev.filter(d=>d.reach>0).length?(prev.filter(d=>d.reach>0).reduce((s,d)=>s+d.eng_rate,0)/prev.filter(d=>d.reach>0).length).toFixed(1):null;
-  const smFollows=sm?(FOLLOWS[sm]||0):null;
+  const smFollows=sm?(FOLLOWS[sm]??null):null;
   const pmFollows=pm?(FOLLOWS[pm]??null):null;
+  const totalViews=acctSum(ACCT_VIEWS), totalReach=acctSum(ACCT_REACH);
+  const totalInter=acctSum(ACCT_INTERACTIONS), totalVisits=acctSum(ACCT_VISITS);
+  const smV=sm?(ACCT_VIEWS[sm]??null):null,   pmV=pm?(ACCT_VIEWS[pm]??null):null;
+  const smR=sm?(ACCT_REACH[sm]??null):null,   pmR=pm?(ACCT_REACH[pm]??null):null;
+  const smI=sm?(ACCT_INTERACTIONS[sm]??null):null, pmI=pm?(ACCT_INTERACTIONS[pm]??null):null;
+  const smVt=sm?(ACCT_VISITS[sm]??null):null, pmVt=pm?(ACCT_VISITS[pm]??null):null;
   document.getElementById('kpi-feed').innerHTML=`
     <div class="kpi hero">
-      <div class="val">${fmt(sum('views'))}${dHtml(sum('views'),psum('views'))}</div>
-      <div class="lbl">Total views</div>
-      <div class="sub">${data.length} post${data.length!==1?'s':''} published</div>
-      <div class="sub" style="margin-top:4px">avg. <strong>${avgViews}</strong> views/post</div>
+      <div class="val">${fmt(totalViews)}${sm?dHtml(smV,pmV):''}</div>
+      <div class="lbl">Account views</div>
+      <div class="sub">${data.length} post${data.length!==1?'s':''} published · ${moList.length} month${moList.length!==1?'s':''}</div>
+      <div class="sub" style="margin-top:4px">avg. <strong>${moList.length?fmt(Math.round(totalViews/moList.length)):'—'}</strong>/month</div>
     </div>
-    <div class="kpi"><div class="val">${fmt(sum('reach'))}${dHtml(sum('reach'),psum('reach'))}</div><div class="lbl">Total reach</div><div class="sub">avg. <strong>${avgReach}</strong> reach/post</div></div>
-    <div class="kpi"><div class="val">${fmt(totalFollows)}${sm?dHtml(smFollows,pmFollows):''}</div><div class="lbl">New followers</div><div class="sub">avg. <strong>${avgFollowsPerMonth}</strong>/month</div></div>
-    <div class="kpi"><div class="val">${ar}${ar!=='—'?'%':''}${ar!=='—'&&par?dHtml(parseFloat(ar),parseFloat(par)):''}</div><div class="lbl">Avg. eng. rate</div><div class="sub">Posts with reach data</div></div>
-    <div class="kpi"><div class="val">${fmt(sum('likes'))}${dHtml(sum('likes'),psum('likes'))}</div><div class="lbl">Total likes</div><div class="sub">${fmt(sum('saves'))} saves · ${fmt(sum('shares'))} shares</div></div>`;
+    <div class="kpi"><div class="val">${fmt(totalReach)}${sm?dHtml(smR,pmR):''}</div><div class="lbl">Account reach</div><div class="sub">Unique accounts reached</div></div>
+    <div class="kpi"><div class="val">${followsMos.length?fmt(totalFollows):'—'}${smFollows!=null?dHtml(smFollows,pmFollows):''}</div><div class="lbl">New followers</div><div class="sub">avg. <strong>${avgFollowsPerMonth}</strong>/month</div></div>
+    <div class="kpi"><div class="val">${fmt(totalInter)}${sm?dHtml(smI,pmI):''}</div><div class="lbl">Interactions</div><div class="sub">Likes, comments, saves &amp; shares</div></div>
+    <div class="kpi"><div class="val">${fmt(totalVisits)}${sm?dHtml(smVt,pmVt):''}</div><div class="lbl">Profile visits</div><div class="sub">avg. <strong>${moList.length?fmt(Math.round(totalVisits/moList.length)):'—'}</strong>/month</div></div>`;
 
   // Insights
   const reels=data.filter(d=>d.type==='IG reel'), cars=data.filter(d=>d.type==='IG carousel');
   const rv=avg(reels,'views'), cv=avg(cars,'views');
   const re=avg(reels.filter(d=>d.reach>0),'eng_rate'), ce=avg(cars.filter(d=>d.reach>0),'eng_rate');
   const moOf2=d=>d.date.substring(0,2);
-  const byM={}; data.forEach(d=>{const m=moOf2(d);byM[m]=(byM[m]||0)+d.views;});
-  const bm=Object.entries(byM).sort((a,b)=>b[1]-a[1])[0];
-  const bf=Object.entries(FOLLOWS).filter(([m])=>data.some(d=>d.date.startsWith(m+'/'))).sort((a,b)=>b[1]-a[1])[0];
+  const bm=moList.filter(m=>m in ACCT_VIEWS).map(m=>[m,ACCT_VIEWS[m]]).sort((a,b)=>b[1]-a[1])[0]||null;
+  const bf=followsMos.length?followsMos.map(m=>[m,FOLLOWS[m]]).sort((a,b)=>b[1]-a[1])[0]:null;
   document.getElementById('insights-feed').innerHTML=`
     <div class="ins-head"><h3>What the numbers say</h3><span class="ins-sub">Key takeaways for your strategy</span></div>
     <div class="insights-grid">
       <div class="insight-item"><div class="ihead">Best format for reach</div><div class="itext">${rv>=cv?`Reels reach further — <strong>${fmt(rv)}</strong> avg. plays vs. <strong>${fmt(cv)}</strong> for carousels.`:`Carousels reach further — <strong>${fmt(cv)}</strong> avg. plays vs. <strong>${fmt(rv)}</strong> for reels.`}</div></div>
       <div class="insight-item"><div class="ihead">Best format for engagement</div><div class="itext">${ce>=re?`Carousels hold attention — <strong>${ce}%</strong> eng. rate vs. <strong>${re}%</strong> for reels.`:`Reels spark interaction — <strong>${re}%</strong> eng. rate vs. <strong>${ce}%</strong> for carousels.`}</div></div>
-      <div class="insight-item"><div class="ihead">Best month &amp; growth</div><div class="itext">${bm?`<strong>${MONTH_FULL[bm[0]]}</strong> was the strongest month with <strong>${fmt(bm[1])}</strong> total plays.${bf?` Most followers came in <strong>${MONTH_FULL[bf[0]]}</strong> (${bf[1]}).`:''}`:' Not enough data.'}</div></div>
+      <div class="insight-item"><div class="ihead">Best month &amp; growth</div><div class="itext">${bm?`<strong>${MONTH_FULL[bm[0]]}</strong> was the strongest month with <strong>${fmt(bm[1])}</strong> account views.${bf?` Most followers came in <strong>${MONTH_FULL[bf[0]]}</strong> (${bf[1]}).`:''}`:' Not enough data.'}</div></div>
     </div>`;
 
   // Monthly combo chart
   dc('m');
-  const pres=getMonthsInRange().filter(([m])=>FEED_RAW.some(d=>d.date.startsWith(m+'/')));
+  const pres=getMonthsInRange().filter(([m])=>m in ACCT_VIEWS);
   const labels=pres.map(x=>x[1]);
   const moOf=d=>d.date.substring(0,2);
-  const vv=pres.map(([m])=>data.filter(d=>moOf(d)===m).reduce((s,d)=>s+d.views,0));
+  const vv=pres.map(([m])=>ACCT_VIEWS[m]||0);
   const ee=pres.map(([m])=>{const p=data.filter(d=>moOf(d)===m&&d.reach>0);return p.length?+(p.reduce((s,d)=>s+d.eng_rate,0)/p.length).toFixed(1):null;});
   const pc=pres.map(([m])=>data.filter(d=>moOf(d)===m).length);
   charts['m']=new Chart(document.getElementById('chartMonthly'),{
     data:{labels,datasets:[
-      {type:'bar',label:'Total views',data:vv,backgroundColor:'rgba(193,128,63,0.85)',hoverBackgroundColor:C.carousel,borderRadius:5,maxBarThickness:46,yAxisID:'y',order:3},
+      {type:'bar',label:'Account views',data:vv,backgroundColor:'rgba(193,128,63,0.85)',hoverBackgroundColor:C.carousel,borderRadius:5,maxBarThickness:46,yAxisID:'y',order:3},
       {type:'line',label:'Eng. rate %',data:ee,borderColor:C.reel,backgroundColor:C.reel,pointRadius:4,pointHoverRadius:7,borderWidth:2.5,tension:.3,yAxisID:'y2',spanGaps:true,order:1},
       {type:'line',label:'# Posts',data:pc,borderColor:'rgba(77,85,54,0.7)',backgroundColor:'rgba(77,85,54,0.7)',pointRadius:4,pointHoverRadius:7,borderWidth:2,borderDash:[4,3],tension:.3,yAxisID:'y3',order:2}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,padding:14}},
-        tooltip:tipStyle(ctx=>ctx.dataset.yAxisID==='y2'?ctx.parsed.y+'%':ctx.dataset.yAxisID==='y3'?ctx.parsed.y+' posts':fmt(ctx.parsed.y)+' views')},
+        tooltip:tipStyle(ctx=>ctx.dataset.yAxisID==='y2'?ctx.parsed.y+'%':ctx.dataset.yAxisID==='y3'?ctx.parsed.y+' posts':fmt(ctx.parsed.y)+' account views')},
       scales:{y:gridScale({ticks:{padding:6,callback:v=>v>=1000?(v/1000)+'k':v}}),
         y2:{position:'right',grid:{display:false},border:{display:false},ticks:{padding:6,callback:v=>v+'%'},suggestedMin:0},
         y3:{position:'right',grid:{display:false},border:{display:false},ticks:{padding:6,callback:v=>v+' p'},suggestedMin:0,offset:true},
         x:{grid:{display:false},border:{display:false},ticks:{padding:6}}}}
   });
 
-  // Follows chart
+  // Follows chart (only months with account-level data)
   dc('f');
-  const fv=pres.map(([m])=>FOLLOWS[m]||0);
+  const fpres=pres.filter(([m])=>m in FOLLOWS);
+  const fv=fpres.map(([m])=>FOLLOWS[m]||0);
   charts['f']=new Chart(document.getElementById('chartFollows'),{type:'bar',
-    data:{labels,datasets:[{label:'New followers',data:fv,backgroundColor:'rgba(150,80,50,0.82)',hoverBackgroundColor:'#965032',borderRadius:5,maxBarThickness:46}]},
+    data:{labels:fpres.map(x=>x[1]),datasets:[{label:'New followers',data:fv,backgroundColor:'rgba(150,80,50,0.82)',hoverBackgroundColor:'#965032',borderRadius:5,maxBarThickness:46}]},
     options:barOpts(ctx=>ctx.parsed.y+' new follower'+(ctx.parsed.y===1?'':'s'))
   });
 
